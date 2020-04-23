@@ -28,3 +28,9 @@ cdcm(o::Op, i::Int, j::Int) = cdm(o,i)*cm(o,j)
 cmcd(o::Op, i::Int, j::Int) = cm(o,i)*cdm(o,j)
 cmcm(o::Op, i::Int, j::Int) = cm(o,i)*cm(o,j)
 cdcd(o::Op, i::Int, j::Int) = cdm(o,i)*cdm(o,j)
+
+function vacuum(o::Op)
+    vac = spzeros(16)
+    vac[1] = 1.0
+    return vac
+end
