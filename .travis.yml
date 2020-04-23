@@ -7,7 +7,6 @@ os:
 julia:
   - 1.0
   - 1.4
-  - nightly
 notifications:
   email: false
 after_success:
@@ -15,5 +14,6 @@ after_success:
   - julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Coveralls.submit(process_folder())'
 jobs:
   allow_failures:
-    - julia: nightly
+    - julia: 1.4
+    - julia: 1.0
   fast_finish: true
