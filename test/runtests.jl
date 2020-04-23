@@ -3,3 +3,4 @@
 #so error can be found independently
 using SafeTestsets
 @safetestset "My f tests" begin include("my_f_tests.jl") end
+@safetestset "State tests" begin include("state_tests.jl") end
