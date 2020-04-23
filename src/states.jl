@@ -1,7 +1,7 @@
 #states constructors
 
 struct State
-    st::Array{Int64,1}
+    st::Array{Float64,1}
     ope::Op
 end
 
