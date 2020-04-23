@@ -66,5 +66,3 @@ function ssp(sta::State_sparse)
     end
     return s
 end
-
-export State, State_sparse, st, ope, rhosp, eigensp, ssp

@@ -28,5 +28,3 @@ cdcm(o::Op, i::Int, j::Int) = cdm(o,i)*cm(o,j)
 cmcd(o::Op, i::Int, j::Int) = cm(o,i)*cdm(o,j)
 cmcm(o::Op, i::Int, j::Int) = cm(o,i)*cm(o,j)
 cdcd(o::Op, i::Int, j::Int) = cdm(o,i)*cdm(o,j)
-
-export  Op, dim, basis, cm, cdm, cdcm, cmcd, cmcm, cdcd
