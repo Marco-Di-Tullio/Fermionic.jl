@@ -6,3 +6,5 @@
 
 
 This programs numerically defines fermionic operators through a sparse matrix representation. The only input the program needs is the dimension, and the corresponding one body fermionic operators will be automatically defined. The you can define states in the base of possible states of the specified dimension, and calculate some of its properties.
+
+![](/images/quantuminfo.png)
