@@ -3,7 +3,6 @@ environment:
   matrix:
   - julia_version: 1.4
 platform:
-  - x86
   - x64
 matrix:
   allow_failures:
