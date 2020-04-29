@@ -35,13 +35,12 @@ function ucnot(o::Op, control::Int64, target::Int64) #c is control, t is target
             data[k] = 1.0
         end
     end
-    mat = sparse(row, col, data)
-    return mat
+    u_cnot = sparse(row, col, data)
+    return u_cnot
 end
 
-
 #Hadamard
-    function hadamard(o::Op, mode1::Int64, mode2::Int64)
+function hadamard(o::Op, mode1::Int64, mode2::Int64)
     #we first check that the input modes are different
     if mode1 == mode2
         throw(ArgumentError("Modes must be differents"))
@@ -57,30 +56,44 @@ end
         throw(ArgumentError("Your modes must be within your dimensions!"))
     end
 
-    row = []
-    col = []
-    data = []
+    row = spzeros(l+2^(d-1))
+    col = spzeros(l+2^(d-1))
+    data = spzeros(l+2^(d-1))
+    counter = 1
     for k in 1:l
         if base[k,i] != 0
             if base[k,j] != 0
-                append!(row, k)
-                append!(col, k)
-                append!(data, 1.0)
+                row[counter] = k
+                col[counter] = k
+                data[counter] = 1.0
+                counter = counter + 1
             else
-                append!(row, [k, k])
-                append!(col, [k, k - 2^(d-i) + 2^(d-j)])
-                append!(data, [1/sqrt(2), 1/sqrt(2)])
+                row[counter] = k
+                col[counter] = k
+                data[counter] = 1.0/sqrt(2)
+                counter = counter + 1
+                row[counter] = k
+                col[counter] = k - 2^(d-i) + 2^(d-j)
+                data[counter] = 1.0/sqrt(2)
+                counter = counter + 1
             end
+
         elseif base[k,j] != 0
-            append!(row, [k, k])
-            append!(col, [k, k + 2^(d-i) - 2^(d-j)])
-            append!(data, [1/sqrt(2), 1/sqrt(2)])
+            row[counter] = k
+            col[counter] = k
+            data[counter] = 1.0/sqrt(2)
+            counter = counter + 1
+            row[counter] = k
+            col[counter] = k + 2^(d-i) - 2^(d-j)
+            data[counter] = 1.0/sqrt(2)
+            counter = counter + 1
         else
-            append!(row, k)
-            append!(col, k)
-            append!(data, 1.0)
+            row[counter] = k
+            col[counter] = k
+            data[counter] = 1.0
+            counter = counter + 1
         end
     end
-    mat = sparse(row,col,data)
-    return mat
+    had = sparse(row,col,data)
+    return had
 end
