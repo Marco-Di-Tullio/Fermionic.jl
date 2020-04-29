@@ -1,21 +1,17 @@
+using Fermionic
+using SparseArrays
+
 
 #U control not
-function ucnot(o::Op, control::Int64, target::Int64) #c is control, t is target
-
-    c = control
-    t = target
-    base = basis(o)
-    d = dim(o)
+function ucnot(o::Op, c::Int64, t::Int64) #c is control, t is target
 
     #we first check that control is different from target:
     if c == t
         throw(ArgumentError("Control must be different from target"))
     end
 
-    if c > d || t > d
-        throw(ArgumentError("Your modes must be within your dimensions!"))
-    end
-
+    base = basis(o)
+    d = dim(o)
     l = 2^d
     row = spzeros(l)
     col = spzeros(l)
@@ -40,8 +36,7 @@ function ucnot(o::Op, control::Int64, target::Int64) #c is control, t is target
 end
 
 
-#Hadamard
-    function hadamard(o::Op, mode1::Int64, mode2::Int64)
+function hadamard(o, mode1, mode2)
     #we first check that the input modes are different
     if mode1 == mode2
         throw(ArgumentError("Modes must be differents"))
@@ -52,11 +47,6 @@ end
     base = basis(o)
     d = dim(o)
     l = 2^d
-
-    if mode1 > d || mode2 > d
-        throw(ArgumentError("Your modes must be within your dimensions!"))
-    end
-
     row = []
     col = []
     data = []

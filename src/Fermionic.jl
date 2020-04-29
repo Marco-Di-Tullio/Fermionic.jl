@@ -9,5 +9,5 @@ include("logic_gates.jl")
 
 export  Op, dim, basis, cm, cdm, cdcm, cmcd, cmcm, cdcd, vacuum
 export State, State_sparse, st, ope, rhosp, eigensp, ssp
-export ucnot
+export ucnot, hadamard
 end # module
