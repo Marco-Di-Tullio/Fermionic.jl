@@ -30,7 +30,8 @@ cmcm(o::Op, i::Int, j::Int) = cm(o,i)*cm(o,j)
 cdcd(o::Op, i::Int, j::Int) = cdm(o,i)*cdm(o,j)
 
 function vacuum(o::Op)
-    vac = spzeros(16)
+    l = 2^dim(o)
+    vac = spzeros(l)
     vac[1] = 1.0
     return vac
 end
