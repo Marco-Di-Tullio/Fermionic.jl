@@ -23,9 +23,13 @@ state2 = hadamard(o, 5, 6)*state1
 
 state3 = ucnot(o, 5, 3)*ucnot(o, 5, 4)*state2
 
-state4 = cdcm(o,1,1)*state3
+state4 = cm(o,1)*state3
 
 state4 = state4/sqrt(state4'*state4)
 
 estado = State_sparse(state4,o)
-#me falta normalizar entropia
+
+print(eigensp(estado))
+#me queda más entrelazado, pero no max entrelazado
+
+#me gustaria hacerlo simbolicamente con a y b libres

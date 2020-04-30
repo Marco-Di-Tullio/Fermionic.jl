@@ -56,7 +56,7 @@ function ssp(sta::State)
             s = s - (eigen[i]*log(eigen[i], 2) + (1 - eigen[i])*log(1-eigen[i], 2))
         end
     end
-    return s
+    return s/lene
 end
 
 function ssp(sta::State_sparse)
