@@ -22,3 +22,10 @@ state1 = ucnot(o, 5, 1)*ucnot(o, 5, 2)*state0
 state2 = hadamard(o, 5, 6)*state1
 
 state3 = ucnot(o, 5, 3)*ucnot(o, 5, 4)*state2
+
+state4 = cdcm(o,1,1)*state3
+
+state4 = state4/sqrt(state4'*state4)
+
+estado = State_sparse(state4,o)
+#me falta normalizar entropia

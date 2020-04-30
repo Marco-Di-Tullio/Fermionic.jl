@@ -97,3 +97,5 @@ function hadamard(o::Op, mode1::Int64, mode2::Int64)
     had = sparse(row,col,data)
     return had
 end
+
+#projective measuments
