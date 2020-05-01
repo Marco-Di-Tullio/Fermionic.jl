@@ -6,7 +6,7 @@ function not(o::Op, mode::Int64) #c is control, t is target
     l = 2^d
 
     if mode > d
-        throw(ArgumentError("Your modes must be within your dimensions!"))
+        throw(ArgumentError("Your mode must be within your dimensions!"))
     end
 
     row = spzeros(l)
@@ -24,6 +24,33 @@ function not(o::Op, mode::Int64) #c is control, t is target
     end
     not = sparse(row, col, data)
     return not
+end
+
+#phase shift
+function phase(o::Op, mode::Int64, phi::Real) #c is control, t is target
+
+    base = basis(o)
+    d = dim(o)
+    l = 2^d
+
+    if mode > d
+        throw(ArgumentError("Your mode must be within your dimensions!"))
+    end
+
+    row = spzeros(l)
+    col = spzeros(l)
+    data = spzeros(Complex{Float64},l)
+    for k in 1:l
+        row[k] = k
+        col[k] = k
+        if base[k,mode] != 0
+            data[k] = round(exp(im*phi), digits = 15)
+        else
+            data[k] = 1.0
+        end
+    end
+    phase = sparse(row, col, data)
+    return phase
 end
 
 #Swap:

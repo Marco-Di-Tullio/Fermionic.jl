@@ -8,6 +8,11 @@ sigma_x2 = cdcd(o,1,2) + cmcm(o,1,2)
 
 sigma_x3 = cdcm(o,1,2) + cdcm(o,2,1) + cdcd(o,1,2) + cmcm(o,1,2)
 
+sigma_y = -im*(cdcm(o,1,2)-cdcm(o,2,1))
+sigma_z = cdcm(o,1,1) - cdcm(o,2,2)
+
+#me falta la phase
+#recalcar que puedo hacer exp(Matrix(operador))
 #esta es la negación de 2 modos
 #Quiero hacer la negación de 1 modo
 o = Op(3)
@@ -79,4 +84,31 @@ function swap(o, mode1, mode2) #c is control, t is target
     end
     swap = sparse(row, col, data)
     return swap
+end
+
+
+function phase(o, mode, phi) #c is control, t is target
+
+    base = basis(o)
+    d = dim(o)
+    l = 2^d
+
+    if mode > d
+        throw(ArgumentError("Your mode must be within your dimensions!"))
+    end
+
+    row = spzeros(l)
+    col = spzeros(l)
+    data = spzeros(Complex{Float64},l)
+    for k in 1:l
+        row[k] = k
+        col[k] = k
+        if base[k,mode] != 0
+            data[k] = round(exp(im*phi))
+        else
+            data[k] = 1.0
+        end
+    end
+    phase = sparse(row, col, data)
+    return phase
 end
