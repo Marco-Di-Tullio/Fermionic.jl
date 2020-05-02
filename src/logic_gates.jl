@@ -1,5 +1,5 @@
-#NOT gate
-function not(o::Op, mode::Int64) #c is control, t is target
+#sigma x (NOT gate)
+function sigma_x(o::Op, mode::Int64) #c is control, t is target
 
     base = basis(o)
     d = dim(o)
@@ -22,8 +22,64 @@ function not(o::Op, mode::Int64) #c is control, t is target
             data[k] = 1.0
         end
     end
-    not = sparse(row, col, data)
-    return not
+    sigma_x = sparse(row, col, data)
+    return sigma_x
+end
+
+#sigma y
+function sigma_y(o::Op, mode::Int64) #c is control, t is target
+
+    base = basis(o)
+    d = dim(o)
+    l = 2^d
+
+    if mode > d
+        throw(ArgumentError("Your mode must be within your dimensions!"))
+    end
+
+    row = spzeros(l)
+    col = spzeros(l)
+    data = spzeros(Complex{Float64},l)
+    for k in 1:l
+        row[k] = k
+        if base[k,mode] != 0
+            col[k] = k - 2^(d-mode)
+            data[k] = 1.0*im
+        else
+            col[k] = k + 2^(d-mode)
+            data[k] = -1.0*im
+        end
+    end
+    sigma_y = sparse(row, col, data)
+    return sigma_y
+end
+
+#sigma z
+function sigma_z(o::Op, mode::Int64) #c is control, t is target
+
+    base = basis(o)
+    d = dim(o)
+    l = 2^d
+
+    if mode > d
+        throw(ArgumentError("Your mode must be within your dimensions!"))
+    end
+
+    row = spzeros(l)
+    col = spzeros(l)
+    data = spzeros(l)
+    for k in 1:l
+        row[k] = k
+        if base[k,mode] != 0
+            col[k] = k
+            data[k] = -1.0
+        else
+            col[k] = k
+            data[k] = 1.0
+        end
+    end
+    sigma_z = sparse(row, col, data)
+    return sigma_z
 end
 
 #phase shift
@@ -52,49 +108,6 @@ function phase(o::Op, mode::Int64, phi::Real) #c is control, t is target
     phase = sparse(row, col, data)
     return phase
 end
-
-#Swap:
-function swap(o::Op, mode1::Int64, mode2::Int64) #c is control, t is target
-
-    base = basis(o)
-    d = dim(o)
-    l = 2^d
-
-    if mode1 > d || mode2 > d
-        throw(ArgumentError("Your modes must be within your dimensions!"))
-    end
-
-    if mode1 == mode2
-        throw(ArgumentError("Modes must be differents"))
-    end
-
-    row = spzeros(l)
-    col = spzeros(l)
-    data = spzeros(l)
-    for k in 1:l
-        row[k] = k
-        if base[k, mode1] != 0
-            if base[k, mode2] != 0
-                col[k] = k
-                data[k] = 1.0
-            else
-                col[k] = k - 2^(d-mode1) + 2^(d-mode2)
-                data[k] = 1.0
-            end
-        else
-            if base[k, mode2] != 0
-                col[k] = k + 2^(d-mode1) - 2^(d-mode2)
-                data[k] = 1.0
-            else
-                col[k] = k
-                data[k] = 1.0
-            end
-        end
-    end
-    swap = sparse(row, col, data)
-    return swap
-end
-
 
 #Hadamard
 function hadamard(o::Op, mode1::Int64, mode2::Int64)
@@ -155,8 +168,6 @@ function hadamard(o::Op, mode1::Int64, mode2::Int64)
     return had
 end
 
-
-
 #U control not
 function ucnot(o::Op, control::Int64, target::Int64) #c is control, t is target
 
@@ -195,4 +206,47 @@ function ucnot(o::Op, control::Int64, target::Int64) #c is control, t is target
     end
     u_cnot = sparse(row, col, data)
     return u_cnot
+end
+
+
+#Swap:
+function swap(o::Op, mode1::Int64, mode2::Int64) #c is control, t is target
+
+    base = basis(o)
+    d = dim(o)
+    l = 2^d
+
+    if mode1 > d || mode2 > d
+        throw(ArgumentError("Your modes must be within your dimensions!"))
+    end
+
+    if mode1 == mode2
+        throw(ArgumentError("Modes must be differents"))
+    end
+
+    row = spzeros(l)
+    col = spzeros(l)
+    data = spzeros(l)
+    for k in 1:l
+        row[k] = k
+        if base[k, mode1] != 0
+            if base[k, mode2] != 0
+                col[k] = k
+                data[k] = 1.0
+            else
+                col[k] = k - 2^(d-mode1) + 2^(d-mode2)
+                data[k] = 1.0
+            end
+        else
+            if base[k, mode2] != 0
+                col[k] = k + 2^(d-mode1) - 2^(d-mode2)
+                data[k] = 1.0
+            else
+                col[k] = k
+                data[k] = 1.0
+            end
+        end
+    end
+    swap = sparse(row, col, data)
+    return swap
 end
