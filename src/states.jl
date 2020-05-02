@@ -53,7 +53,7 @@ function ssp(sta::State)
     s = 0
     for i in 1:lene
         if eigen[i] != 0 && eigen[i] != 1
-            s = s - (eigen[i]*log(eigen[i], 2) + (1 - eigen[i])*log(1-eigen[i], 2))
+            s = s - (eigen[i]*log(2,eigen[i]) + (1 - eigen[i])*log(2,1-eigen[i]))
         end
     end
     return s/lene
