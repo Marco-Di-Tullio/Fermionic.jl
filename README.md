@@ -5,9 +5,11 @@
 [![Codecov](https://codecov.io/gh/Marco-Di-Tullio/Fermionic.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/Marco-Di-Tullio/Fermionic.jl)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/Marco-Di-Tullio/Fermionic.jl/master)
 
-Everything relating to fermions can be expressed in terms of annilhation and creation operators. This package numerically defines fermionic operators and can therefore be used for building any fermionic operator and state.
+Everything relating to fermions can be expressed in terms of annilhation and creation operators. This package numerically defines fermionic operators and can therefore be used for building any fermionic operator and state. It also defines the main Quantum Gates.
 
 The only input the program needs is the dimension, and the corresponding one body fermionic operators will be automatically defined as sparse matrices. Then you can define states in the base of possible states of the specified dimension, and calculate some of its properties.
+
+You can perform any unitary operation with this package. You can also use some of the most commons logical gates (Pauli matrices, phase shift, Hadamard, Ucnot, SWAP).
 
 For installing this package, you must first acces the pkg REPL (by typing ']' in your command line) and then execute
 
@@ -17,6 +19,6 @@ The pkg manager will automatically download the package. Then you can initialize
 
 ```using Fermionic```
 
-For instructions on how to use this package, you can read the 'Fermionic tutorial' located in the folder 'examples\'
+For instructions on how to use this package, you can read the tutorials located in the folder 'examples\'
 
 ![](/images/quantuminfo.png)
