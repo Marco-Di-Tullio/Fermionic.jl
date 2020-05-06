@@ -25,6 +25,8 @@ Alternatively, you can install the package from an editor/Jupyter notebook by ty
 
 ```Pkg.add("Fermionic")```
 
+```using Fermionic```
+
 For instructions on how to use this package, you can read the tutorials located in the folder 'examples\'
 
 ![](/images/quantuminfo.png)
