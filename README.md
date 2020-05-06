@@ -19,6 +19,11 @@ The pkg manager will automatically download the package. Then you can initialize
 
 ```using Fermionic```
 
+Alternatively, you can install the package from an editor/Jupyter notebook by typing
+
+```import Pkg```
+```Pkg.add("Fermionic")```
+
 For instructions on how to use this package, you can read the tutorials located in the folder 'examples\'
 
 ![](/images/quantuminfo.png)
