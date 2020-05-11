@@ -87,65 +87,6 @@ function rhosp(sta::State_sparse_complex)
     return rhospsc
 end
 
-prec = 15 #precision
-eigensp(s::State) = [round(eigvals(rhosp(s))[i], digits = prec) for i in 1:dim(ope(s))]
-eigensp(s::State_complex) = [round(eigvals(rhosp(s))[i], digits = prec) for i in 1:dim(ope(s))]
-#For some reason, I can not compute eigenvalues
-#directly from sparse matrices
-eigensp(s::State_sparse) = [round(eigvals(Matrix(rhosp(s)))[i], digits = prec) for i in 1:dim(ope(s))]
-eigensp(s::State_sparse_complex) = [round(eigvals(Matrix(rhosp(s)))[i], digits = prec) for i in 1:dim(ope(s))]
-
-function ssp(sta::State)
-    eigen = eigensp(sta)
-    lene = length(eigen)
-    s = 0
-    for i in 1:lene
-        if eigen[i] != 0 && eigen[i] != 1
-            s = s - (eigen[i]*log(2,eigen[i]) + (1 - eigen[i])*log(2,1-eigen[i]))
-        end
-    end
-    return s/lene
-end
-
-function ssp(sta::State_complex)
-    eigen = eigensp(sta)
-    lene = length(eigen)
-    s = 0
-    for i in 1:lene
-        if eigen[i] != 0 && eigen[i] != 1
-            s = s - (eigen[i]*log(2,eigen[i]) + (1 - eigen[i])*log(2,1-eigen[i]))
-        end
-    end
-    return s/lene
-end
-
-function ssp(sta::State_sparse)
-    eigen = eigensp(sta)
-    lene = length(eigen)
-    s = 0
-    for i in 1:lene
-        if eigen[i] != 0 && eigen[i] != 1
-            s = s - (eigen[i]*log(2, eigen[i]) + (1 - eigen[i])*log(2, 1-eigen[i]))
-        end
-    end
-    return s/lene
-end
-
-
-function ssp(sta::State_sparse_complex)
-    eigen = eigensp(sta)
-    lene = length(eigen)
-    s = 0
-    for i in 1:lene
-        if eigen[i] != 0 && eigen[i] != 1
-            s = s - (eigen[i]*log(2, eigen[i]) + (1 - eigen[i])*log(2, 1-eigen[i]))
-        end
-    end
-    return s/lene
-end
-
-
-
 function kqsp(sta::State)
     precis = 15
     n = dim(ope(sta))
