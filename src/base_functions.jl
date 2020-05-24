@@ -22,6 +22,8 @@ function operators(n)
     return cm_tot, cd_tot, l, base
 end
 
+#This function outputs elements for building
+#the sparse matrix of basis
 function integer_digits(n)
     rowb = spzeros(n*2^(n-1))
     colb = spzeros(n*2^(n-1))
