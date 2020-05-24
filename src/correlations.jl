@@ -3,12 +3,28 @@ prec = 15 #precision
 ##Single Particle
 eigensp(s::State) = [round(eigvals(rhosp(s))[i], digits = prec) for i in 1:dim(ope(s))]
 eigensp(s::State_complex) = [round(eigvals(rhosp(s))[i], digits = prec) for i in 1:dim(ope(s))]
+eigensp(s::State_fixed) = [round(eigvals(rhosp(s))[i], digits = prec) for i in 1:dim(ope(s))]
+eigensp(s::State_complex_fixed) = [round(eigvals(rhosp(s))[i], digits = prec) for i in 1:dim(ope(s))]
 #For some reason, I can not compute eigenvalues
 #directly from sparse matrices
 eigensp(s::State_sparse) = [round(eigvals(Matrix(rhosp(s)))[i], digits = prec) for i in 1:dim(ope(s))]
 eigensp(s::State_sparse_complex) = [round(eigvals(Matrix(rhosp(s)))[i], digits = prec) for i in 1:dim(ope(s))]
+eigensp(s::State_sparse_fixed) = [round(eigvals(Matrix(rhosp(s)))[i], digits = prec) for i in 1:dim(ope(s))]
+eigensp(s::State_sparse_complex_fixed) = [round(eigvals(Matrix(rhosp(s)))[i], digits = prec) for i in 1:dim(ope(s))]
 
 function ssp(sta::State)
+    eigen = eigensp(sta)
+    lene = length(eigen)
+    s = 0
+    for i in 1:lene
+        if eigen[i] != 0 && eigen[i] != 1
+            s = s - (eigen[i]*log(2,eigen[i]) + (1 - eigen[i])*log(2,1-eigen[i]))
+        end
+    end
+    return s/lene
+end
+
+function ssp(sta::State_fixed)
     eigen = eigensp(sta)
     lene = length(eigen)
     s = 0
@@ -32,7 +48,31 @@ function ssp(sta::State_complex)
     return s/lene
 end
 
+function ssp(sta::State_complex_fixed)
+    eigen = eigensp(sta)
+    lene = length(eigen)
+    s = 0
+    for i in 1:lene
+        if eigen[i] != 0 && eigen[i] != 1
+            s = s - (eigen[i]*log(2,eigen[i]) + (1 - eigen[i])*log(2,1-eigen[i]))
+        end
+    end
+    return s/lene
+end
+
 function ssp(sta::State_sparse)
+    eigen = eigensp(sta)
+    lene = length(eigen)
+    s = 0
+    for i in 1:lene
+        if eigen[i] != 0 && eigen[i] != 1
+            s = s - (eigen[i]*log(2, eigen[i]) + (1 - eigen[i])*log(2, 1-eigen[i]))
+        end
+    end
+    return s/lene
+end
+
+function ssp(sta::State_sparse_fixed)
     eigen = eigensp(sta)
     lene = length(eigen)
     s = 0
@@ -55,6 +95,19 @@ function ssp(sta::State_sparse_complex)
     end
     return s/lene
 end
+
+function ssp(sta::State_sparse_complex_fixed)
+    eigen = eigensp(sta)
+    lene = length(eigen)
+    s = 0
+    for i in 1:lene
+        if eigen[i] != 0 && eigen[i] != 1
+            s = s - (eigen[i]*log(2, eigen[i]) + (1 - eigen[i])*log(2, 1-eigen[i]))
+        end
+    end
+    return s/lene
+end
+
 
 ## Quasi Particles
 eigenqsp(s::State) = [round(eigvals(rhoqsp(s))[i], digits = prec) for i in 1:(2*dim(ope(s)))]
