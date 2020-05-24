@@ -1,6 +1,7 @@
 #This functions trimms the operators matrix
 #for fixed particle number subspace
-function fixed(o, n, nume)
+function fixed(o, nume)
+    n = Int(log(2,size(o)[1]))
     posn = filter(n, nume)
     reduced = o[setdiff(1:end,posn), setdiff(1:end,posn)]
     return reduced

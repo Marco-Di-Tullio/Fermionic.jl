@@ -48,7 +48,7 @@ function rhosp(sta::State_fixed)
     o = ope(sta)
     for i in 1:n
         for j in 1:n
-            rhospv[i,j] = round(estate'*fixed(cdcm(o, i, j), n, num)*estate, digits = precis)
+            rhospv[i,j] = round(estate'*fixed(cdcm(o, i, j), num)*estate, digits = precis)
         end
     end
     return rhospv
@@ -63,7 +63,7 @@ function rhosp(sta::State_sparse_fixed)
     o = ope(sta)
     for i in 1:n
         for j in 1:n
-            rhosps[i,j] = round(estate'*fixed(cdcm(o, i, j), n, num)*estate, digits = precis)
+            rhosps[i,j] = round(estate'*fixed(cdcm(o, i, j), num)*estate, digits = precis)
         end
     end
     return rhosps
@@ -78,7 +78,7 @@ function rhosp(sta::State_complex_fixed)
     o = ope(sta)
     for i in 1:n
         for j in 1:n
-            rhospvc[i,j] = round(estate'*fixed(cdcm(o, i, j), n, num)*estate, digits = precis)
+            rhospvc[i,j] = round(estate'*fixed(cdcm(o, i, j), num)*estate, digits = precis)
         end
     end
     return rhospvc
@@ -93,7 +93,7 @@ function rhosp(sta::State_sparse_complex_fixed)
     o = ope(sta)
     for i in 1:n
         for j in 1:n
-            rhospsc[i,j] = round(estate'*fixed(cdcm(o, i, j), n, num)*estate, digits = precis)
+            rhospsc[i,j] = round(estate'*fixed(cdcm(o, i, j), num)*estate, digits = precis)
         end
     end
     return rhospsc
