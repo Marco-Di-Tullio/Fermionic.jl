@@ -7,6 +7,14 @@ function fixed(o, nume)
     return reduced
 end
 
+function fixed_state(stat, nume)
+    n = Int(log(2,length(stat)))
+    posn = filter(n, nume)
+    reduced = stat[setdiff(1:end,posn)]
+    return reduced
+end
+
+
 function filter(n, m)
     _,_,baso,_ = integer_digits(n)
     posn = zeros(Int64, Int(2^n-binomial(n,m)))

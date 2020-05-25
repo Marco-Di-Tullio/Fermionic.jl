@@ -37,6 +37,6 @@ function eigensp_mixed(probs::Array{Float64,1}, states::Union{Array{State,1},Arr
     #    end
     #end
 
-    eig = sort(eigvals(rhosp_mixed(probs, states)), rev=true)
+    eig = sort(eigvals(Matrix(rhosp_mixed(probs, states))), rev=true)
     return eig
 end

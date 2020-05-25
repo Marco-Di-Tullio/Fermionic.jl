@@ -224,3 +224,8 @@ function majorization_qsp(s1, s2)
         return 0
     end
 end
+
+function n_avg(s::Union{State,State_complex,State_sparse,State_sparse_complex})
+    navg = Real(tr(rhosp(s)))
+    return navg
+end
