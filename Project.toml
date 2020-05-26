@@ -1,7 +1,7 @@
 name = "Fermionic"
 uuid = "9854c450-6826-470b-b7cd-d3803b32f4ba"
 authors = ["Marco Di Tullio",  "Raul Rossignoli"]
-version = "1.1.1"
+version = "1.1.2"
 
 [deps]
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
