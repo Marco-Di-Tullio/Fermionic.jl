@@ -229,3 +229,249 @@ function n_avg(s::Union{State,State_complex,State_sparse,State_sparse_complex})
     navg = Real(tr(rhosp(s)))
     return navg
 end
+
+
+function basis_m(o::Op, m::Int)
+    d = dim(o)
+    basm = spzeros(binomial(d,m),d)
+    counter = 1
+    baso = basis(o)
+    for i in 1:2^d
+        if sum(baso[i,:]) == m
+            basm[counter,:] = baso[i,:]
+            counter = counter + 1
+        end
+    end
+    return basm
+end
+
+
+####################################################
+
+
+
+
+#the following are m-body matrices: work on progress
+#for example, for a vector [0,1,0,0,1]->[2,5]
+function indx(arr)
+    l = length(arr)
+    ind = spzeros(0)
+    for i=1:l
+        if arr[i] != 0
+            ind = sparse([ind; i])
+        end
+    end
+    return ind
+end
+
+
+function cof_mat(o, d, num, m, bas, estat)
+    cmat = zeros(binomial(d,m),binomial(d,num-m))
+    am = sparse([bas[i,:] for i in 1:binomial(d, m)])
+    bas_nume_m = basis_m(o, num - m)
+    amn = sparse([bas_nume_m[i,:] for i in 1:binomial(d, num-m)])
+    for i in 1:binomial(d, m)
+        ai = am[i]
+        indi = indx(ai)
+        for j in 1:binomial(d, num-m)
+            aj = amn[j]
+            if ai'*aj != 0
+                cmat[i,j] = 0
+            else
+                permut = 0
+                for k in 1:length(indi)
+                    permut = permut + sum(aj[1:floor(Int,indi[k]-1)])
+                end
+                indij = indx(ai+aj)
+                elem = Int(sum([2^(d-i) for i in indij]) + 1)
+                cmat[i,j] = estat[elem] * (-1)^permut
+            end
+        end
+    end
+    return cmat
+end
+
+
+function cof_mat_comp(o, d, num, m, bas, estat)
+    cmat = zeros(Complex{Float64},binomial(d,m),binomial(d,num-m))
+    am = sparse([bas[i,:] for i in 1:binomial(d, m)])
+    bas_nume_m = basis_m(o, num - m)
+    amn = sparse([bas_nume_m[i,:] for i in 1:binomial(d, num-m)])
+    for i in 1:binomial(d, m)
+        ai = am[i]
+        indi = indx(ai)
+        for j in 1:binomial(d, num-m)
+            aj = amn[j]
+            if ai'*aj != 0
+                cmat[i,j] = 0
+            else
+                permut = 0
+                for k in 1:length(indi)
+                    permut = permut + sum(aj[1:floor(Int,indi[k]-1)])
+                end
+                indij = indx(ai+aj)
+                elem = Int(sum([2^(d-i) for i in indij]) + 1)
+                cmat[i,j] = estat[elem] * (-1)^permut
+            end
+        end
+    end
+    return cmat
+end
+
+
+function cof_mat_fixed(o, d, num, m, bas, bas_tot, estat)
+    cmat = zeros(binomial(d,m),binomial(d,num-m))
+    am = sparse([bas[i,:] for i in 1:binomial(d, m)])
+    bas_nume_m = basis_m(o, num - m)
+    amn = sparse([bas_nume_m[i,:] for i in 1:binomial(d, num-m)])
+    for i in 1:binomial(d, m)
+        ai = am[i]
+        indi = indx(ai)
+        for j in 1:binomial(d, num-m)
+            aj = amn[j]
+            if ai'*aj != 0
+                cmat[i,j] = 0
+            else
+                permut = 0
+                for k in 1:length(indi)
+                    permut = permut + sum(aj[1:floor(Int,indi[k]-1)])
+                end
+                indij = indx(ai+aj)
+                elem = 1
+                while indx(bas_tot[elem,:]) != indij
+                    elem = elem + 1
+                end
+                cmat[i,j] = estat[elem] * (-1)^permut
+            end
+        end
+    end
+    return cmat
+end
+
+
+function cof_mat_fixed_comp(o, d, num, m, bas, bas_tot, estat)
+    cmat = zeros(Complex{Float64},binomial(d,m),binomial(d,num-m))
+    am = sparse([bas[i,:] for i in 1:binomial(d, m)])
+    bas_nume_m = basis_m(o, num - m)
+    amn = sparse([bas_nume_m[i,:] for i in 1:binomial(d, num-m)])
+    for i in 1:binomial(d, m)
+        ai = am[i]
+        indi = indx(ai)
+        for j in 1:binomial(d, num-m)
+            aj = amn[j]
+            if ai'*aj != 0
+                cmat[i,j] = 0
+            else
+                permut = 0
+                for k in 1:length(indi)
+                    permut = permut + sum(aj[1:floor(Int,indi[k]-1)])
+                end
+                indij = indx(ai+aj)
+                elem = 1
+                while indx(bas_tot[elem,:]) != indij
+                    elem = elem + 1
+                end
+                cmat[i,j] = estat[elem] * (-1)^permut
+            end
+        end
+    end
+    return cmat
+end
+
+function non_diag_ops(o, d, nume, m, bas, i)
+    vec = indx(bas[i, :])
+    #le es nume-1 me parece
+    mel = 1
+    for j in 1:m
+        mel = mel*cdm(o, Int(vec[j]))
+    end
+    return mel
+end
+
+
+function diag_ops(o, d, nume, m, bas, u, and, i)
+    ad = spzeros(2^d, 2^d)
+    for j in 1:binomial(d,m)
+        if round(u[j,i], digits=14) != 0
+            ad = ad + u[j, i]*and[j]
+        end
+    end
+    return ad
+end
+
+
+
+#main function
+function rhom(s::Union{State,State_sparse}, m::Int64)
+    o = ope(s)
+    num = Int(n_avg(s))
+    d = dim(o) #tengo que pasar a matrix lamentablemente
+    rhomd = spzeros(binomial(d, m), binomial(d, m))
+    bas = basis_m(o, m)
+    estat = st(s)
+    u, _ = svd(cof_mat(o, d, num, m, bas, estat))
+    and = sparse([non_diag_ops(o, d, num, m, bas, j) for j in 1:binomial(d, m)])
+    ad = sparse([diag_ops(o, d, num, m, bas, u, and, j) for j in 1:binomial(d, m)])
+    #ad[1] es evaluar la funcion diagonal en i=1
+    for i in 1:binomial(d, m)
+        rhomd[i,i] = round(estat'*ad[i]*ad[i]'*estat, digits = 14)
+    end
+    return rhomd
+end
+
+
+#main function
+function rhom(s::Union{State_complex,State_sparse_complex}, m::Int64)
+    o = ope(s)
+    num = Int(n_avg(s))
+    d = dim(o) #tengo que pasar a matrix lamentablemente
+    rhomd = spzeros(binomial(d, m), binomial(d, m))
+    bas = basis_m(o, m)
+    estat = st(s)
+    u, _ = svd(cof_mat_comp(o, d, num, m, bas, estat))
+    and = sparse([non_diag_ops(o, d, num, m, bas, j) for j in 1:binomial(d, m)])
+    ad = sparse([diag_ops(o, d, num, m, bas, u, and, j) for j in 1:binomial(d, m)])
+    #ad[1] es evaluar la funcion diagonal en i=1
+    for i in 1:binomial(d, m)
+        rhomd[i,i] = round(estat'*ad[i]*ad[i]'*estat, digits = 14)
+    end
+    return rhomd
+end
+
+
+function rhom(s::Union{State_fixed,State_sparse_fixed}, m::Int64)
+    o = ope(s)
+    num = nume(s)
+    d = dim(o) #tengo que pasar a matrix lamentablemente
+    rhomd = spzeros(binomial(d, m), binomial(d, m))
+    bas_tot = basis_m(o, num)
+    bas = basis_m(o, m)
+    estat = st(s)
+    u, _ = svd(cof_mat_fixed(o, d, num, m, bas, bas_tot, estat))
+    and = sparse([non_diag_ops(o, d, num, m, bas, i) for i in 1:binomial(d, m)])
+    ad = sparse([diag_ops(o, d, num, m, bas, u, and, i) for i in 1:binomial(d, m)])
+    #ad[1] es evaluar la funcion diagonal en i=1
+    for i in 1:binomial(d, m)
+        rhomd[i,i] = round(estat'*fixed(ad[i]*ad[i]',num)*estat, digits = 14)
+    end
+    return rhomd
+end
+
+
+function rhom(s::Union{State_complex_fixed,State_sparse_complex_fixed}, m::Int64)
+    o = ope(s)
+    num = nume(s)
+    d = dim(o) #tengo que pasar a matrix lamentablemente
+    rhomd = spzeros(binomial(d, m), binomial(d, m))
+    bas_tot = basis_m(o, num)
+    bas = basis_m(o, m)
+    estat = st(s)
+    u, _ = svd(cof_mat_fixed_comp(o, d, num, m, bas, bas_tot, estat))
+    and = sparse([non_diag_ops(o, d, num, m, bas, i) for i in 1:binomial(d, m)])
+    ad = sparse([diag_ops(o, d, num, m, bas, u, and, i) for i in 1:binomial(d, m)])
+    #ad[1] es evaluar la funcion diagonal en i=1
+    for i in 1:binomial(d, m)
+        rhomd[i,i] = round(estat'*fixed(ad[i]*ad[i]',num)*estat, digits = 14)
+    end
+    return rhomd
+end

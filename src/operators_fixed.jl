@@ -27,18 +27,3 @@ function filter(n, m)
     end
     return posn
 end
-
-
-function basis_m(o::Op, m::Int)
-    d = dim(o)
-    basm = spzeros(binomial(d,m),d)
-    counter = 1
-    baso = basis(o)
-    for i in 1:2^d
-        if sum(baso[i,:]) == m
-            basm[counter,:] = baso[i,:]
-            counter = counter + 1
-        end
-    end
-    return basm
-end
