@@ -1,16 +1,16 @@
 prec = 15 #precision
 
 ##Single Particle
-eigensp(s::State) = [round(eigvals(rhosp(s))[i], digits = prec) for i in 1:dim(ope(s))]
-eigensp(s::State_complex) = [round(eigvals(rhosp(s))[i], digits = prec) for i in 1:dim(ope(s))]
-eigensp(s::State_fixed) = [round(eigvals(rhosp(s))[i], digits = prec) for i in 1:dim(ope(s))]
-eigensp(s::State_complex_fixed) = [round(eigvals(rhosp(s))[i], digits = prec) for i in 1:dim(ope(s))]
+eigensp(s::State) = sort([round(eigvals(rhosp(s))[i], digits = prec) for i in 1:dim(ope(s))], rev=true)
+eigensp(s::State_complex) = sort([round(eigvals(rhosp(s))[i], digits = prec) for i in 1:dim(ope(s))], rev=true)
+eigensp(s::State_fixed) = sort([round(eigvals(rhosp(s))[i], digits = prec) for i in 1:dim(ope(s))], rev=true)
+eigensp(s::State_complex_fixed) = sort([round(eigvals(rhosp(s))[i], digits = prec) for i in 1:dim(ope(s))], rev=true)
 #For some reason, I can not compute eigenvalues
 #directly from sparse matrices
-eigensp(s::State_sparse) = [round(eigvals(Matrix(rhosp(s)))[i], digits = prec) for i in 1:dim(ope(s))]
-eigensp(s::State_sparse_complex) = [round(eigvals(Matrix(rhosp(s)))[i], digits = prec) for i in 1:dim(ope(s))]
-eigensp(s::State_sparse_fixed) = [round(eigvals(Matrix(rhosp(s)))[i], digits = prec) for i in 1:dim(ope(s))]
-eigensp(s::State_sparse_complex_fixed) = [round(eigvals(Matrix(rhosp(s)))[i], digits = prec) for i in 1:dim(ope(s))]
+eigensp(s::State_sparse) = sort([round(eigvals(Matrix(rhosp(s)))[i], digits = prec) for i in 1:dim(ope(s))], rev=true)
+eigensp(s::State_sparse_complex) = sort([round(eigvals(Matrix(rhosp(s)))[i], digits = prec) for i in 1:dim(ope(s))], rev=true)
+eigensp(s::State_sparse_fixed) = sort([round(eigvals(Matrix(rhosp(s)))[i], digits = prec) for i in 1:dim(ope(s))], rev=true)
+eigensp(s::State_sparse_complex_fixed) = sort([round(eigvals(Matrix(rhosp(s)))[i], digits = prec) for i in 1:dim(ope(s))], rev=true)
 
 function ssp(sta::State)
     eigen = eigensp(sta)
@@ -110,12 +110,12 @@ end
 
 
 ## Quasi Particles
-eigenqsp(s::State) = [round(eigvals(rhoqsp(s))[i], digits = prec) for i in 1:(2*dim(ope(s)))]
-eigenqsp(s::State_complex) = [round(eigvals(rhoqsp(s))[i], digits = prec) for i in 1:(2*dim(ope(s)))]
+eigenqsp(s::State) = sort([round(eigvals(rhoqsp(s))[i], digits = prec) for i in 1:(2*dim(ope(s)))], rev=true)
+eigenqsp(s::State_complex) = sort([round(eigvals(rhoqsp(s))[i], digits = prec) for i in 1:(2*dim(ope(s)))], rev=true)
 #For some reason, I can not compute eigenvalues
 #directly from sparse matrices
-eigenqsp(s::State_sparse) = [round(eigvals(Matrix(rhoqsp(s)))[i], digits = prec) for i in 1:(2*dim(ope(s)))]
-eigenqsp(s::State_sparse_complex) = [round(eigvals(Matrix(rhoqsp(s)))[i], digits = prec) for i in 1:(2*dim(ope(s)))]
+eigenqsp(s::State_sparse) = sort([round(eigvals(Matrix(rhoqsp(s)))[i], digits = prec) for i in 1:(2*dim(ope(s)))], rev=true)
+eigenqsp(s::State_sparse_complex) = sort([round(eigvals(Matrix(rhoqsp(s)))[i], digits = prec) for i in 1:(2*dim(ope(s)))], rev=true)
 
 
 function sqsp(sta::State)
@@ -167,16 +167,17 @@ function sqsp(sta::State_sparse_complex)
 end
 
 #This macro serves for printing as a string the variable's name
+#=
 macro Name(arg)
    string(arg)
 end
-
+=#
 #This function outputs 1 if s1 majorizes s2,
 #-1 if s2 majorizes s1,
 #0 if there is no majorization relation
 function majorization_sp(s1, s2)
-    e1 = sort(eigensp(s1), rev = true)
-    e2 = sort(eigensp(s2), rev = true)
+    e1 = eigensp(s1)
+    e2 = eigensp(s2)
     count1 = 0
     count2 = 0
     d = length(e1)
@@ -188,21 +189,21 @@ function majorization_sp(s1, s2)
         end
     end
     if count1 == (d-1)
-        println(@Name(s2)," sp majorizes ", @Name(s1))
+        #println(@Name(s2)," sp majorizes ", @Name(s1))
         return -1
     elseif count2 == (d-1)
-        println(@Name(s1)," sp majorizes ", @Name(s2))
+        #println(@Name(s1)," sp majorizes ", @Name(s2))
         return 1
     else
-        println("There is no sp majorization relation")
+        #println("There is no sp majorization relation")
         return 0
     end
 end
 
 
 function majorization_qsp(s1, s2)
-    e1 = sort(eigenqsp(s1), rev = true)
-    e2 = sort(eigenqsp(s2), rev = true)
+    e1 = eigenqsp(s1)
+    e2 = eigenqsp(s2)
     count1 = 0
     count2 = 0
     d = length(e1)
@@ -214,13 +215,13 @@ function majorization_qsp(s1, s2)
         end
     end
     if count1 == (d-1)
-        println(@Name(s2)," qsp majorizes ", @Name(s1))
+        #println(@Name(s2)," qsp majorizes ", @Name(s1))
         return -1
     elseif count2 == (d-1)
-        println(@Name(s1)," qsp majorizes ", @Name(s2))
+        #println(@Name(s1)," qsp majorizes ", @Name(s2))
         return 1
     else
-        println("There is no qsp majorization relation")
+        #println("There is no qsp majorization relation")
         return 0
     end
 end
@@ -244,7 +245,40 @@ function basis_m(o::Op, m::Int)
     end
     return basm
 end
+#= This code is faster for many iterations
 
+count = 0
+@time for i in 1:repeticiones
+    #definimos estado premedida
+    state_ran = spzeros(Complex{Float64},l)
+    for i in 1:l
+        if sum(basis(o)[i,:]) == nume
+            state_ran[i] = 2*rand(Complex{Float64},1)[1]-1-im
+        end
+    end
+    state_ran = state_ran/sqrt(state_ran'*state_ran)
+    state_ran = State_sparse_complex(state_ran, o);
+    #e = sort(eigvals(Matrix(rhoqsp(state_ran))), rev=true)
+
+    #ahora medimos
+    state_ran_medido = operator*st(state_ran);
+    state_ran_medido = state_ran_medido/sqrt(state_ran_medido'*state_ran_medido)
+    state_ran_medido = State_sparse_complex(state_ran_medido, o)
+    #e_medido = sort(eigvals(Matrix(rhoqsp(state_ran_medido))), rev=true)
+
+    #y chequeamos mayorización
+    global count = count + majorization_qsp(state_ran_medido, state_ran)
+end
+
+if count == repeticiones
+    println("Measured state qsp majorizes unmeasured state")
+elseif count == -repeticiones
+    println("Unmeasured state qsp majorizes measured state")
+else
+    println("There is no qsp majorization")
+end
+
+=#
 
 ####################################################
 
