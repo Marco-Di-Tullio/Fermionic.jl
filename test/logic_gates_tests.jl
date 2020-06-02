@@ -12,6 +12,7 @@ using Test
     @test phase(Op(6),2,pi/4)[1,3] == 0.0
     @test swap(Op(3),1,2)[3,5] == 1.0
     @test swap(Op(5),1,2)[5,6] == 0.0
+    @test swap(Op(3),1,2)[8,8] == -1.0
     @test sigma_x(Op(3),2)[1,3] == 1.0
     @test sigma_x(Op(5),2)[1,1] == 0.0
     @test sigma_y(Op(2),2)[2,1] == 0.0 + 1.0*im

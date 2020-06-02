@@ -232,7 +232,7 @@ function swap(o::Op, mode1::Int64, mode2::Int64) #c is control, t is target
         if base[k, mode1] != 0
             if base[k, mode2] != 0
                 col[k] = k
-                data[k] = 1.0
+                data[k] = -1.0
             else
                 col[k] = k - 2^(d-mode1) + 2^(d-mode2)
                 data[k] = 1.0
