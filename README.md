@@ -9,7 +9,7 @@ Everything relating to fermions can be expressed in terms of annilhation and cre
 
 The only input the program needs is the dimension, and the corresponding one body fermionic operators will be automatically defined as sparse matrices. Then you can define states in the base of possible states of the specified dimension, and calculate some of its properties.
 
-You can perform any unitary operation with this package. You can also use some of the most commons logical gates (Pauli matrices, phase shift, Hadamard, Ucnot, SWAP).
+You can perform any unitary operation with this package and use some of the most commons logical gates (Pauli matrices, phase shift, Hadamard, Ucnot, SWAP) to perform fermionic quantum computation.
 
 For installing this package, you must first acces the pkg REPL (by typing ']' in your command line) and then execute
 
