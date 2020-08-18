@@ -438,7 +438,7 @@ end
 #main function
 function rhom(s::Union{State,State_sparse}, m::Int64)
     o = ope(s)
-    num = Int(n_avg(s))
+    num = Int(round(n_avg(s),digits = 8))
     d = dim(o) #tengo que pasar a matrix lamentablemente
     rhomd = spzeros(binomial(d, m), binomial(d, m))
     bas = basis_m(o, m)
@@ -457,7 +457,7 @@ end
 #main function
 function rhom(s::Union{State_complex,State_sparse_complex}, m::Int64)
     o = ope(s)
-    num = Int(n_avg(s))
+    num = Int(round(n_avg(s),digits = 8))
     d = dim(o) #tengo que pasar a matrix lamentablemente
     rhomd = spzeros(binomial(d, m), binomial(d, m))
     bas = basis_m(o, m)
