@@ -231,7 +231,7 @@ function n_avg(s::Union{State,State_complex,State_sparse,State_sparse_complex})
     return navg
 end
 
-
+#= Old fixed basis
 function basis_m(o::Op, m::Int)
     d = dim(o)
     basm = spzeros(binomial(d,m),d)
@@ -245,6 +245,9 @@ function basis_m(o::Op, m::Int)
     end
     return basm
 end
+=#
+
+
 #= This code is faster for many iterations
 
 count = 0
@@ -282,9 +285,6 @@ end
 
 ####################################################
 
-
-
-
 #the following are m-body matrices: work on progress
 #for example, for a vector [0,1,0,0,1]->[2,5]
 function indx(arr)
@@ -302,7 +302,7 @@ end
 function cof_mat(o, d, num, m, bas, estat)
     cmat = zeros(binomial(d,m),binomial(d,num-m))
     am = sparse([bas[i,:] for i in 1:binomial(d, m)])
-    bas_nume_m = basis_m(o, num - m)
+    bas_nume_m, _ = basis_m(d, num - m)
     amn = sparse([bas_nume_m[i,:] for i in 1:binomial(d, num-m)])
     for i in 1:binomial(d, m)
         ai = am[i]
@@ -329,7 +329,7 @@ end
 function cof_mat_comp(o, d, num, m, bas, estat)
     cmat = zeros(Complex{Float64},binomial(d,m),binomial(d,num-m))
     am = sparse([bas[i,:] for i in 1:binomial(d, m)])
-    bas_nume_m = basis_m(o, num - m)
+    bas_nume_m, _ = basis_m(d, num - m)
     amn = sparse([bas_nume_m[i,:] for i in 1:binomial(d, num-m)])
     for i in 1:binomial(d, m)
         ai = am[i]
@@ -356,7 +356,7 @@ end
 function cof_mat_fixed(o, d, num, m, bas, bas_tot, estat)
     cmat = zeros(binomial(d,m),binomial(d,num-m))
     am = sparse([bas[i,:] for i in 1:binomial(d, m)])
-    bas_nume_m = basis_m(o, num - m)
+    bas_nume_m, _ = basis_m(d, num - m)
     amn = sparse([bas_nume_m[i,:] for i in 1:binomial(d, num-m)])
     for i in 1:binomial(d, m)
         ai = am[i]
@@ -386,7 +386,7 @@ end
 function cof_mat_fixed_comp(o, d, num, m, bas, bas_tot, estat)
     cmat = zeros(Complex{Float64},binomial(d,m),binomial(d,num-m))
     am = sparse([bas[i,:] for i in 1:binomial(d, m)])
-    bas_nume_m = basis_m(o, num - m)
+    bas_nume_m, _ = basis_m(d, num - m)
     amn = sparse([bas_nume_m[i,:] for i in 1:binomial(d, num-m)])
     for i in 1:binomial(d, m)
         ai = am[i]
@@ -441,7 +441,7 @@ function rhom(s::Union{State,State_sparse}, m::Int64)
     num = Int(round(n_avg(s),digits = 8))
     d = dim(o) #tengo que pasar a matrix lamentablemente
     rhomd = spzeros(binomial(d, m), binomial(d, m))
-    bas = basis_m(o, m)
+    bas, _ = basis_m(d, m)
     estat = st(s)
     u, _ = svd(cof_mat(o, d, num, m, bas, estat))
     and = sparse([non_diag_ops(o, d, num, m, bas, j) for j in 1:binomial(d, m)])
@@ -460,7 +460,7 @@ function rhom(s::Union{State_complex,State_sparse_complex}, m::Int64)
     num = Int(round(n_avg(s),digits = 8))
     d = dim(o) #tengo que pasar a matrix lamentablemente
     rhomd = spzeros(binomial(d, m), binomial(d, m))
-    bas = basis_m(o, m)
+    bas, _ = basis_m(d, m)
     estat = st(s)
     u, _ = svd(cof_mat_comp(o, d, num, m, bas, estat))
     and = sparse([non_diag_ops(o, d, num, m, bas, j) for j in 1:binomial(d, m)])
@@ -478,8 +478,8 @@ function rhom(s::Union{State_fixed,State_sparse_fixed}, m::Int64)
     num = nume(s)
     d = dim(o) #tengo que pasar a matrix lamentablemente
     rhomd = spzeros(binomial(d, m), binomial(d, m))
-    bas_tot = basis_m(o, num)
-    bas = basis_m(o, m)
+    bas_tot, _ = basis_m(d, num)
+    bas, _ = basis_m(d, m)
     estat = st(s)
     u, _ = svd(cof_mat_fixed(o, d, num, m, bas, bas_tot, estat))
     and = sparse([non_diag_ops(o, d, num, m, bas, i) for i in 1:binomial(d, m)])
@@ -497,8 +497,8 @@ function rhom(s::Union{State_complex_fixed,State_sparse_complex_fixed}, m::Int64
     num = nume(s)
     d = dim(o) #tengo que pasar a matrix lamentablemente
     rhomd = spzeros(binomial(d, m), binomial(d, m))
-    bas_tot = basis_m(o, num)
-    bas = basis_m(o, m)
+    bas_tot, _ = basis_m(d, num)
+    bas, _ = basis_m(d, m)
     estat = st(s)
     u, _ = svd(cof_mat_fixed_comp(o, d, num, m, bas, bas_tot, estat))
     and = sparse([non_diag_ops(o, d, num, m, bas, i) for i in 1:binomial(d, m)])
@@ -506,6 +506,75 @@ function rhom(s::Union{State_complex_fixed,State_sparse_complex_fixed}, m::Int64
     #ad[1] es evaluar la funcion diagonal en i=1
     for i in 1:binomial(d, m)
         rhomd[i,i] = round(estat'*fixed(ad[i]*ad[i]',num)*estat, digits = 14)
+    end
+    return rhomd
+end
+
+#The following are the rhom matrices without diagonalization
+# i.e. in the original basis
+function rhomnd(s::Union{State,State_sparse}, m::Int64)
+    o = ope(s)
+    num = Int(round(n_avg(s),digits = 8))
+    d = dim(o) #tengo que pasar a matrix lamentablemente
+    rhomd = spzeros(binomial(d, m), binomial(d, m))
+    bas = basis_m(o, m)
+    estat = st(s)
+    and = sparse([non_diag_ops(o, d, num, m, bas, j) for j in 1:binomial(d, m)])
+    for i in 1:binomial(d, m)
+        for j in 1:binomial(d,m)
+            rhomd[i,j] = round(estat'*and[j]*and[i]'*estat, digits = 14)
+        end
+    end
+    return rhomd
+end
+
+#main function
+function rhomnd(s::Union{State_complex,State_sparse_complex}, m::Int64)
+    o = ope(s)
+    num = Int(round(n_avg(s),digits = 8))
+    d = dim(o) #tengo que pasar a matrix lamentablemente
+    rhomd = spzeros(binomial(d, m), binomial(d, m))
+    bas = basis_m(o, m)
+    estat = st(s)
+    and = sparse([non_diag_ops(o, d, num, m, bas, j) for j in 1:binomial(d, m)])
+    for i in 1:binomial(d, m)
+        for j in 1:binomial(d,m)
+            rhomd[i,j] = round(estat'*and[j]*and[i]'*estat, digits = 14)
+        end
+    end
+    return rhomd
+end
+
+#main function
+function rhomnd(s::Union{State_fixed,State_sparse_fixed}, m::Int64)
+    o = ope(s)
+    num = Int(round(n_avg(s),digits = 8))
+    d = dim(o) #tengo que pasar a matrix lamentablemente
+    rhomd = spzeros(binomial(d, m), binomial(d, m))
+    bas = basis_m(o, m)
+    estat = st(s)
+    and = sparse([non_diag_ops(o, d, num, m, bas, j) for j in 1:binomial(d, m)])
+    for i in 1:binomial(d, m)
+        for j in 1:binomial(d,m)
+            rhomd[i,j] = round(estat'*and[j]*and[i]'*estat, digits = 14)
+        end
+    end
+    return rhomd
+end
+
+#main function
+function rhomnd(s::Union{State_complex_fixed,State_sparse_complex_fixed}, m::Int64)
+    o = ope(s)
+    num = Int(round(n_avg(s),digits = 8))
+    d = dim(o) #tengo que pasar a matrix lamentablemente
+    rhomd = spzeros(binomial(d, m), binomial(d, m))
+    bas = basis_m(o, m)
+    estat = st(s)
+    and = sparse([non_diag_ops(o, d, num, m, bas, j) for j in 1:binomial(d, m)])
+    for i in 1:binomial(d, m)
+        for j in 1:binomial(d,m)
+            rhomd[i,j] = round(estat'*and[j]*and[i]'*estat, digits = 14)
+        end
     end
     return rhomd
 end

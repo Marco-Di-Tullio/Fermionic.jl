@@ -47,6 +47,39 @@ function integer_digits(n)
     return rowb, colb, base, vacio
 end
 
+# The following function outputs the basis with fixed_state
+# particle number together with the indices
+function basis_m(n,m)
+    len = binomial(n,m)
+    rowb = spzeros(m*len)
+    colb = spzeros(m*len)
+    data = spzeros(m*len)
+    #binarios will be the index for the basis element in
+    #the complete basis
+    binarios = spzeros(m*len)
+    counter = 1
+    counter2 = 1
+    base = spzeros(len,n)
+    for i in 0:(2^n-1)
+        binary_base = bitstring(i)[65-n:64]
+        bin_vector = splitter(binary_base)
+        if sum(bin_vector) == m
+            for j in 1:n
+                if bin_vector[j] == 1
+                    rowb[counter] = counter2::Int
+                    colb[counter] = j::Int
+                    data[counter] = 1
+                    counter = counter + 1
+                end
+             end
+            binarios[counter2] = i
+            counter2 = counter2+1
+        end
+    end
+    base = sparse(rowb, colb, data)
+    # It could also output rowb and colb if necessary
+    return base, binarios
+end
 
 function splitter(x)
     vectorized = []
