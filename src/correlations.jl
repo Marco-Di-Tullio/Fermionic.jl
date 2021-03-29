@@ -578,3 +578,121 @@ function rhomnd(s::Union{State_complex_fixed,State_sparse_complex_fixed}, m::Int
     end
     return rhomd
 end
+
+
+#Partial trace in a given basis of modes
+function trp(state::Union{State,State_sparse},modos::Array{Int64,1})
+    d = dim(ope(state))
+    bas = basis(ope(state))
+    sta = st(state)
+    lm = length(modos)
+    zvr = zeros(2^lm,2^(d-lm))
+    full = [i for i in 1:d]
+    lista = sort(modos)
+    listb = filter(x->x ∉ lista,full)
+    for k in 1:2^d
+        indicea=parse(Int,join([Int(bas[k,i]) for i in lista]), base=2)+1
+        indiceb=parse(Int,join([Int(bas[k,i]) for i in listb]), base=2)+1
+        signi = 0
+        for i in lista
+            listac = filter(x->x <= i-1,listb)
+            signl = 0
+            for l in listac
+                signl = signl+bas[k,l]
+            end
+            signi = signi + signl*bas[k,i]
+        end
+        sign = (-1)^(signi)
+        zvr[indicea,indiceb]=sta[k]*sign
+    end
+    rhoa=zvr*zvr'
+    rhob=zvr'*zvr;
+    return rhoa, rhob
+end
+
+function trp(state::Union{State_complex,State_sparse_complex},modos::Array{Int64,1})
+    d = dim(ope(state))
+    bas = basis(ope(state))
+    sta = st(state)
+    lm = length(modos)
+    zvr = zeros(2^lm,2^(d-lm))
+    full = [i for i in 1:d]
+    lista = sort(modos)
+    listb = filter(x->x ∉ lista,full)
+    for k in 1:2^d
+        indicea=parse(Int,join([Int(bas[k,i]) for i in lista]), base=2)+1
+        indiceb=parse(Int,join([Int(bas[k,i]) for i in listb]), base=2)+1
+        signi = 0
+        for i in lista
+            listac = filter(x->x <= i-1,listb)
+            signl = 0
+            for l in listac
+                signl = signl+bas[k,l]
+            end
+            signi = signi + signl*bas[k,i]
+        end
+        sign = (-1)^(signi)
+        zvr[indicea,indiceb]=sta[k]*sign
+    end
+    rhoa=zvr*zvr'
+    rhob=zvr'*zvr;
+    return rhoa, rhob
+end
+
+function trp(state::Union{State_fixed,State_sparse_fixed},modos::Array{Int64,1})
+    d = dim(ope(state))
+    bas = basis(ope(state))
+    sta = st(state)
+    lm = length(modos)
+    zvr = zeros(2^lm,2^(d-lm))
+    full = [i for i in 1:d]
+    lista = sort(modos)
+    listb = filter(x->x ∉ lista,full)
+    for k in 1:2^d
+        indicea=parse(Int,join([Int(bas[k,i]) for i in lista]), base=2)+1
+        indiceb=parse(Int,join([Int(bas[k,i]) for i in listb]), base=2)+1
+        signi = 0
+        for i in lista
+            listac = filter(x->x <= i-1,listb)
+            signl = 0
+            for l in listac
+                signl = signl+bas[k,l]
+            end
+            signi = signi + signl*bas[k,i]
+        end
+        sign = (-1)^(signi)
+        zvr[indicea,indiceb]=sta[k]*sign
+    end
+    rhoa=zvr*zvr'
+    rhob=zvr'*zvr;
+    return rhoa, rhob
+end
+
+function trp(state::Union{State_complex_fixed,State_sparse_complex_fixed},modos::Array{Int64,1})
+    d = dim(ope(state))
+    bas = basis(ope(state))
+    sta = st(state)
+    lm = length(modos)
+    zvr = zeros(2^lm,2^(d-lm))
+    full = [i for i in 1:d]
+    lista = sort(modos)
+    listb = filter(x->x ∉ lista,full)
+    for k in 1:2^d
+        indicea=parse(Int,join([Int(bas[k,i]) for i in lista]), base=2)+1
+        indiceb=parse(Int,join([Int(bas[k,i]) for i in listb]), base=2)+1
+        signi = 0
+        for i in lista
+            listac = filter(x->x <= i-1,listb)
+            signl = 0
+            for l in listac
+                signl = signl+bas[k,l]
+            end
+            signi = signi + signl*bas[k,i]
+        end
+        sign = (-1)^(signi)
+        zvr[indicea,indiceb]=sta[k]*sign
+    end
+    rhoa=zvr*zvr'
+    rhob=zvr'*zvr;
+    return rhoa, rhob
+end
