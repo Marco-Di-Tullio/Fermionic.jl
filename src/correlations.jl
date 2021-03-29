@@ -606,8 +606,9 @@ function trp(state::Union{State,State_sparse},modos::Array{Int64,1})
         zvr[indicea,indiceb]=sta[k]*sign
     end
     rhoa=zvr*zvr'
-    rhob=zvr'*zvr;
-    return rhoa, rhob
+    #rhob=zvr'*zvr;
+    #return rhoa, rhob
+    return rhoa
 end
 
 function trp(state::Union{State_complex,State_sparse_complex},modos::Array{Int64,1})
@@ -635,8 +636,9 @@ function trp(state::Union{State_complex,State_sparse_complex},modos::Array{Int64
         zvr[indicea,indiceb]=sta[k]*sign
     end
     rhoa=zvr*zvr'
-    rhob=zvr'*zvr;
-    return rhoa, rhob
+    #rhob=zvr'*zvr;
+    #return rhoa, rhob
+    return rhoa
 end
 
 function trp(state::Union{State_fixed,State_sparse_fixed},modos::Array{Int64,1})
@@ -664,8 +666,9 @@ function trp(state::Union{State_fixed,State_sparse_fixed},modos::Array{Int64,1})
         zvr[indicea,indiceb]=sta[k]*sign
     end
     rhoa=zvr*zvr'
-    rhob=zvr'*zvr;
-    return rhoa, rhob
+    #rhob=zvr'*zvr;
+    #return rhoa, rhob
+    return rhoa
 end
 
 function trp(state::Union{State_complex_fixed,State_sparse_complex_fixed},modos::Array{Int64,1})
@@ -693,6 +696,7 @@ function trp(state::Union{State_complex_fixed,State_sparse_complex_fixed},modos:
         zvr[indicea,indiceb]=sta[k]*sign
     end
     rhoa=zvr*zvr'
-    rhob=zvr'*zvr;
-    return rhoa, rhob
+    #rhob=zvr'*zvr;
+    #return rhoa, rhob
+    return rhoa
 end
