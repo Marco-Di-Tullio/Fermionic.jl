@@ -579,7 +579,6 @@ function rhomnd(s::Union{State_complex_fixed,State_sparse_complex_fixed}, m::Int
     return rhomd
 end
 
-
 #Partial trace in a given basis of modes
 function trp(state::Union{State,State_sparse},modos::Array{Int64,1})
     d = dim(ope(state))
@@ -607,7 +606,6 @@ function trp(state::Union{State,State_sparse},modos::Array{Int64,1})
     end
     rhoa=zvr*zvr'
     #rhob=zvr'*zvr;
-    #return rhoa, rhob
     return rhoa
 end
 
@@ -616,7 +614,7 @@ function trp(state::Union{State_complex,State_sparse_complex},modos::Array{Int64
     bas = basis(ope(state))
     sta = st(state)
     lm = length(modos)
-    zvr = zeros(2^lm,2^(d-lm))
+    zvr = zeros(Complex{Float64},2^lm,2^(d-lm))
     full = [i for i in 1:d]
     lista = sort(modos)
     listb = filter(x->x ∉ lista,full)
@@ -635,9 +633,8 @@ function trp(state::Union{State_complex,State_sparse_complex},modos::Array{Int64
         sign = (-1)^(signi)
         zvr[indicea,indiceb]=sta[k]*sign
     end
-    rhoa=zvr*zvr'
+    rhoa=zvr*conj(zvr')
     #rhob=zvr'*zvr;
-    #return rhoa, rhob
     return rhoa
 end
 
@@ -646,7 +643,7 @@ function trp(state::Union{State_fixed,State_sparse_fixed},modos::Array{Int64,1})
     bas = basis(ope(state))
     sta = st(state)
     lm = length(modos)
-    zvr = zeros(2^lm,2^(d-lm))
+    zvr = zeros(Complex{Float64},2^lm,2^(d-lm))
     full = [i for i in 1:d]
     lista = sort(modos)
     listb = filter(x->x ∉ lista,full)
@@ -665,9 +662,8 @@ function trp(state::Union{State_fixed,State_sparse_fixed},modos::Array{Int64,1})
         sign = (-1)^(signi)
         zvr[indicea,indiceb]=sta[k]*sign
     end
-    rhoa=zvr*zvr'
+    rhoa=zvr*conj(zvr')
     #rhob=zvr'*zvr;
-    #return rhoa, rhob
     return rhoa
 end
 
@@ -697,6 +693,5 @@ function trp(state::Union{State_complex_fixed,State_sparse_complex_fixed},modos:
     end
     rhoa=zvr*zvr'
     #rhob=zvr'*zvr;
-    #return rhoa, rhob
     return rhoa
 end
