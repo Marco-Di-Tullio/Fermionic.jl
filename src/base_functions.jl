@@ -56,7 +56,7 @@ function basis_m(n,m)
     data = spzeros(m*len)
     #binarios will be the index for the basis element in
     #the complete basis
-    binarios = spzeros(m*len)
+    binarios = spzeros(binomial(n,m))
     counter = 1
     counter2 = 1
     base = spzeros(len,n)
