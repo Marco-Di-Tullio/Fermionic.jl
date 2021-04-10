@@ -639,6 +639,8 @@ function trp(state::Union{State_complex,State_sparse_complex},modos::Array{Int64
     return rhoa
 end
 
+#= Work in Progress: partial trace for fixed particle number
+
 function trp(state::Union{State_fixed,State_sparse_fixed},modos::Array{Int64,1})
     d = dim(ope(state))
     bas = basis(ope(state))
@@ -673,7 +675,7 @@ function trp(state::Union{State_complex_fixed,State_sparse_complex_fixed},modos:
     bas = basis(ope(state))
     sta = st(state)
     lm = length(modos)
-    zvr = zeros(2^lm,2^(d-lm))
+    zvr = zeros(Complex{Float64},2^lm,2^(d-lm))
     full = [i for i in 1:d]
     lista = sort(modos)
     listb = filter(x->x ∉ lista,full)
@@ -696,3 +698,4 @@ function trp(state::Union{State_complex_fixed,State_sparse_complex_fixed},modos:
     #rhob=zvr'*zvr;
     return rhoa
 end
+=#
