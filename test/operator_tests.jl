@@ -12,4 +12,6 @@ using Test
     @test basis_m(8,2)[2][4] == 9.0
     @test cdc(6,2,3,3)[6,6] == 1.0
     @test cdc(6,2,3,2)[14,15] == 1.0
+    @test cdc(basis_m(4,2)[1],basis_m(4,2)[2],1,2)[4,2]==1
+    @test ccd(basis_m(4,2)[1],basis_m(4,2)[2],1,2)[2,4]==1
 end
