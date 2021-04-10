@@ -56,30 +56,20 @@ Output
 16-element SparseArrays.SparseVector{Float64,Int64} with 1 stored entry:
   [15]  =  1.0
 ```
-because we are working on the basis 
+because we are working on the Fock Space, were
 
 ```julia
-Matrix(basis(o))
+Matrix(basis(o))[15,:]
 ```
 
+is equal to
+
 ```julia
-16×4 Array{Float64,2}:
- 0.0  0.0  0.0  0.0
- 0.0  0.0  0.0  1.0
- 0.0  0.0  1.0  0.0
- 0.0  0.0  1.0  1.0
- 0.0  1.0  0.0  0.0
- 0.0  1.0  0.0  1.0
- 0.0  1.0  1.0  0.0
- 0.0  1.0  1.0  1.0
- 1.0  0.0  0.0  0.0
- 1.0  0.0  0.0  1.0
- 1.0  0.0  1.0  0.0
- 1.0  0.0  1.0  1.0
- 1.0  1.0  0.0  0.0
- 1.0  1.0  0.0  1.0
- 1.0  1.0  1.0  0.0
- 1.0  1.0  1.0  1.0
+4-element Array{Float64,1}:
+ 1.0
+ 1.0
+ 1.0
+ 0.0
  ```
  
 A more interesting exaple: Simulating a superconductor.
