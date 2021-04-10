@@ -56,7 +56,7 @@ Output
 16-element SparseArrays.SparseVector{Float64,Int64} with 1 stored entry:
   [15]  =  1.0
 ```
-because we are working on the Fock Space, were
+as we are working on the Fock Space, were
 
 ```julia
 Matrix(basis(o))[15,:]
