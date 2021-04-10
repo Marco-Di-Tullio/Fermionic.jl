@@ -129,7 +129,6 @@ Output
  0.311511811686744
 ```
 
-This can also be done in a more efficient way working in the fixed particle number subspace, or symbolically, as you can see in the superconducting example in the corresponding folder. 
-
+This can also be done in a more efficient way working in the fixed particle number subspace, or symbolically (non fixed g and e), as you can see in 'examples\6. Solving a superconducting system (Example)'. 
 
 ![](/images/quantuminfo.png)
