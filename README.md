@@ -8,17 +8,18 @@
 
 Fermionic is a Julia toolkit for implementing fermionic simulations and exploring its quantum information properties.
 
-Everything relating to fermions can be expressed in terms of annilhation and creation operators. This package numerically constructs fermionic operators and can therefore be used for building any fermionic operator and state. It also defines the main Quantum Gates.
+Everything relating to fermions can be expressed in terms of annihilation and creation operators. This package numerically constructs fermionic operators and can therefore be used for building any fermionic operator and state. It also defines the main Quantum Gates.
 
 The corresponding fermionic operators can be constructed both in the full Fock space or in the fixed particle number subspace. Then you can define states in the corresponding base and calculate several properties. 
 
 Many interesting quantities can be obtained from states in Fermionic, such as one body matrices entropy, partially traced systems, m-bodies density matrices, one body entropies, majorization relations, average particle number and more.
 
-You can also perform any unitary operation with this package and use some of the most commons logical gates (Pauli matrices, phase shift, Hadamard, Ucnot, SWAP) to perform fermionic quantum computation.
+You can also perform any unitary operation with this package and use some of the most common logical gates (Pauli matrices, phase shift, Hadamard, Ucnot, SWAP) to perform fermionic quantum computation.
+
 
 ## Installation
 
-For installing this package, you must first acces the pkg REPL (by typing ']' in your command line) and then execute
+For installing this package, you must first access the pkg REPL (by typing ']' in your command line) and then execute
 
 ```add Fermionic```
 
@@ -34,6 +35,111 @@ Alternatively, you can install the package from an editor/Jupyter notebook by ty
 
 ```using Fermionic```
 
-For instructions on how to use this package, you can read the tutorials located in the folder 'examples\'
+## Getting started
+
+For instructions on how to use this package, you can read the tutorials located in the folder 'examples\'.  For a quick preview, check out the following snippet for a simple example of Fermionic in action:
+
+
+```julia
+using Fermionic
+
+# We initialize the fermionic operators in dimension d
+d = 4
+o = Op(d)
+
+# We build the state by applying creation operators on the vacuum
+vac = vacuum(o)
+st = cdm(o,1)*cdm(o,2)*cdm(o,3)*vac
+```
+Output
+```julia
+16-element SparseArrays.SparseVector{Float64,Int64} with 1 stored entry:
+  [15]  =  1.0
+```
+because we are working on the basis 
+
+```julia
+Matrix(basis(o))
+```
+
+```julia
+16×4 Array{Float64,2}:
+ 0.0  0.0  0.0  0.0
+ 0.0  0.0  0.0  1.0
+ 0.0  0.0  1.0  0.0
+ 0.0  0.0  1.0  1.0
+ 0.0  1.0  0.0  0.0
+ 0.0  1.0  0.0  1.0
+ 0.0  1.0  1.0  0.0
+ 0.0  1.0  1.0  1.0
+ 1.0  0.0  0.0  0.0
+ 1.0  0.0  0.0  1.0
+ 1.0  0.0  1.0  0.0
+ 1.0  0.0  1.0  1.0
+ 1.0  1.0  0.0  0.0
+ 1.0  1.0  0.0  1.0
+ 1.0  1.0  1.0  0.0
+ 1.0  1.0  1.0  1.0
+ ```
+ 
+A more interesting exaple: Simulating a superconductor.
+
+```julia
+using Fermionic
+
+#=
+We will construct the superconducting Hamiltonian, obtain its fundamental state and some property
+=#
+
+# This system will have 4 levels with a double degeneracy
+d = 8 
+o = Op(d);
+
+# We select the energy of each level and the coupling between them
+e0 = 1.0
+g = 5.0
+
+epsilon = [2*e0*(i-d/4-1/2) for i in 1:d/2]
+epsilon = sort([epsilon; epsilon])
+
+# The non interacting Hamiltonian
+h0 = sum([epsilon[i]*(cdm(o,i)*cm(o,i) + cdm(o,i+1)*cm(o,i+1)) for i in 1:2:(Int(d)-1)])
+
+# The interacting Hamiltonian
+hi = sum([sum([if i==j spzeros(2^d, 2^d) else g*(cdm(o,j)*cdm(o,j+1)*cm(o,i+1)*cm(o,i)) end
+                    for i in 1:2:(Int(d)-1)]) for j in 1:2:(Int(d)-1)])
+
+# The full Hamiltonian
+h = h0 - hi
+
+# We compute the fundamental state of the full Hamiltonian
+fundamental = eigvecs(Matrix(h))[:,1]
+
+# We normalize the state
+fundamental = fundamental/sqrt(fundamental'*fundamental)
+
+# We initialize a state with fundamental
+fund = State(fundamental,o)
+
+# We can now access some properties, for instance the eigenvalues of the one body matrix
+eigensp(fund)
+```
+
+Output
+
+```julia
+8-element Array{Float64,1}:
+ 0.688488188313256
+ 0.688488188313256
+ 0.575317665651686
+ 0.575317665651686
+ 0.424682334348314
+ 0.424682334348314
+ 0.311511811686744
+ 0.311511811686744
+```
+
+This can also be done in a more efficient way working in the fixed particle number subspace, or symbolically, as you can see in the superconducting example in the corresponding folder. 
+
 
 ![](/images/quantuminfo.png)
