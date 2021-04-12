@@ -9,9 +9,9 @@ struct Op
     Op(dim) = new(dim, operators(dim)...)
 end
 
-#after being defined, one can
-#retrieve the dimension by typping
-# dim(op4)
+# after being defined, one can
+# retrieve the dimension by typping
+# dim(o)
 dim(o::Op) = o.dim
 cmtot(o::Op) = o.cmtot
 cdtot(o::Op) = o.cdtot
