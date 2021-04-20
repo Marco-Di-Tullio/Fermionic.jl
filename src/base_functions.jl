@@ -78,6 +78,7 @@ function basis_m(n,m)
     end
     base = sparse(rowb, colb, data)
     # It could also output rowb and colb if necessary
+    binarios = binarios .+1
     return base, binarios
 end
 

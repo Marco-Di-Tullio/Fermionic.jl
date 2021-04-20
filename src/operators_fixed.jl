@@ -32,7 +32,8 @@ end
 # Much faster than using fiexed over the whole operators
 
 function cdc(n::Int64, m::Int64, i::Int64, j::Int64)
-    base, indice = basis_m(n,m)
+    base, ind = basis_m(n,m)
+    indice = ind .-1
     l = binomial(n,m)
     op = spzeros(l,l)
     if i==j
@@ -56,10 +57,11 @@ end
 
 # When using many operators, it is easier to predefine the basis outside
 # the function
-function cdc(base::SparseArrays.SparseMatrixCSC{Float64,Int64}, indice::SparseArrays.SparseVector{Float64,Int64}, i::Int64, j::Int64)
+function cdc(base::SparseArrays.SparseMatrixCSC{Float64,Int64}, ind::SparseArrays.SparseVector{Float64,Int64}, i::Int64, j::Int64)
     l = size(base)[1]
     n = size(base)[2]
     op = spzeros(l,l)
+    indice = ind .-1
     if i==j
         for k in 1:l
             if base[k,:][j] == 1
