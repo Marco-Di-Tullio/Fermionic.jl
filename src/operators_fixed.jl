@@ -14,6 +14,18 @@ function fixed_state(stat, nume)
     return reduced
 end
 
+# This functions takes stat, an array
+# in the reduced space, into the full 2^n
+# space. Index is the index from basis_m
+# and d the dimension
+function unfixed(stat, index, d)
+    l = size(stat)[1]
+    state2n = zeros(2^d)
+    for (i,v) in enumerate(index)
+        state2n[Int(v)]=stat[i]
+    end
+    return state2n
+end
 
 function ffilter(n, m)
     _,_,baso,_ = integer_digits(n)
