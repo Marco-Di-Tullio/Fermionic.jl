@@ -1,13 +1,13 @@
 #This functions trimms the operators matrix
 #for fixed particle number subspace
-function fixed(o, nume)
+function fixed(o, nume::Int64)
     n = Int(log(2,size(o)[1]))
     posn = ffilter(n, nume)
     reduced = o[setdiff(1:end,posn), setdiff(1:end,posn)]
     return reduced
 end
 
-function fixed_state(stat, nume)
+function fixed_state(stat, nume::Int64)
     n = Int(log(2,length(stat)))
     posn = ffilter(n, nume)
     reduced = stat[setdiff(1:end,posn)]
@@ -18,7 +18,7 @@ end
 # in the reduced space, into the full 2^n
 # space. Index is the index from basis_m
 # and d the dimension
-function unfixed(stat, index, d)
+function unfixed(stat, index, d::Int64)
     l = size(stat)[1]
     state2n = zeros(2^d)
     for (i,v) in enumerate(index)
@@ -27,7 +27,7 @@ function unfixed(stat, index, d)
     return state2n
 end
 
-function ffilter(n, m)
+function ffilter(n::Int64, m::Int64)
     _,_,baso,_ = integer_digits(n)
     posn = zeros(Int64, Int(2^n-binomial(n,m)))
     countern = 1
