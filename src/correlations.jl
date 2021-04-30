@@ -121,7 +121,6 @@ function majorization_sp(s1, s2)
     end
 end
 
-
 function majorization_qsp(s1, s2)
     e1 = eigenqsp(s1)
     e2 = eigenqsp(s2)
@@ -151,23 +150,6 @@ function n_avg(s::Union{State,State_sparse})
     navg = Real(tr(rhosp(s)))
     return navg
 end
-
-#= Old fixed basis
-function basis_m(o::Op, m::Int)
-    d = dim(o)
-    basm = spzeros(binomial(d,m),d)
-    counter = 1
-    baso = basis(o)
-    for i in 1:2^d
-        if sum(baso[i,:]) == m
-            basm[counter,:] = baso[i,:]
-            counter = counter + 1
-        end
-    end
-    return basm
-end
-=#
-
 
 #= This code is faster for many iterations
 
@@ -246,65 +228,8 @@ function cof_mat(o, d, num, m, bas, estat, ty)
     return cmat
 end
 
-
-function cof_mat_comp(o, d, num, m, bas, estat)
-    cmat = zeros(Complex{Float64},binomial(d,m),binomial(d,num-m))
-    am = sparse([bas[i,:] for i in 1:binomial(d, m)])
-    bas_nume_m, _ = basis_m(d, num - m)
-    amn = sparse([bas_nume_m[i,:] for i in 1:binomial(d, num-m)])
-    for i in 1:binomial(d, m)
-        ai = am[i]
-        indi = indx(ai)
-        for j in 1:binomial(d, num-m)
-            aj = amn[j]
-            if ai'*aj != 0
-                cmat[i,j] = 0
-            else
-                permut = 0
-                for k in 1:length(indi)
-                    permut = permut + sum(aj[1:floor(Int,indi[k]-1)])
-                end
-                indij = indx(ai+aj)
-                elem = Int(sum([2^(d-i) for i in indij]) + 1)
-                cmat[i,j] = estat[elem] * (-1)^permut
-            end
-        end
-    end
-    return cmat
-end
-
 function cof_mat_fixed(o, d, num, m, bas, bas_tot, estat, ty)
     cmat = zeros(ty,binomial(d,m),binomial(d,num-m))
-    am = sparse([bas[i,:] for i in 1:binomial(d, m)])
-    bas_nume_m, _ = basis_m(d, num - m)
-    amn = sparse([bas_nume_m[i,:] for i in 1:binomial(d, num-m)])
-    for i in 1:binomial(d, m)
-        ai = am[i]
-        indi = indx(ai)
-        for j in 1:binomial(d, num-m)
-            aj = amn[j]
-            if ai'*aj != 0
-                cmat[i,j] = 0
-            else
-                permut = 0
-                for k in 1:length(indi)
-                    permut = permut + sum(aj[1:floor(Int,indi[k]-1)])
-                end
-                indij = indx(ai+aj)
-                elem = 1
-                while indx(bas_tot[elem,:]) != indij
-                    elem = elem + 1
-                end
-                cmat[i,j] = estat[elem] * (-1)^permut
-            end
-        end
-    end
-    return cmat
-end
-
-
-function cof_mat_fixed_comp(o, d, num, m, bas, bas_tot, estat)
-    cmat = zeros(Complex{Float64},binomial(d,m),binomial(d,num-m))
     am = sparse([bas[i,:] for i in 1:binomial(d, m)])
     bas_nume_m, _ = basis_m(d, num - m)
     amn = sparse([bas_nume_m[i,:] for i in 1:binomial(d, num-m)])
@@ -408,7 +333,6 @@ function rhomnd(s::Union{State,State_sparse}, m::Int64)
     return rhomd
 end
 
-
 #= Work in Progress: non diagonal operators with fixed states
 function rhomnd(s::Union{State_fixed,State_sparse_fixed}, m::Int64)
     o = ope(s)
@@ -475,7 +399,6 @@ function trp(state::Union{State,State_sparse},modos::Array{Int64,1})
 end
 
 #= Work in Progress: partial trace for fixed particle number
-
 function trp(state::Union{State_fixed,State_sparse_fixed},modos::Array{Int64,1})
     d = dim(ope(state))
     bas = basis(ope(state))

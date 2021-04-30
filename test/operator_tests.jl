@@ -14,4 +14,6 @@ using Test
     @test cdc(6,2,3,2)[14,15] == 1.0
     @test cdc(basis_m(4,2)[1],basis_m(4,2)[2],1,2)[4,2]==1
     @test ccd(basis_m(4,2)[1],basis_m(4,2)[2],1,2)[2,4]==1
+    @test ccd(6,2,1,2)[8,12] == 1.0
+    @test unfixed([0,0,0,0,1/sqrt(2),1/sqrt(2)],basis_m(4,2)[2],4)[13] == 1/sqrt(2)
 end
