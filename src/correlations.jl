@@ -2,53 +2,13 @@ prec = 15 #precision
 
 ##Single Particle
 eigensp(s::State) = sort([round(eigvals(rhosp(s))[i], digits = prec) for i in 1:dim(ope(s))], rev=true)
-eigensp(s::State_complex) = sort([round(eigvals(rhosp(s))[i], digits = prec) for i in 1:dim(ope(s))], rev=true)
 eigensp(s::State_fixed) = sort([round(eigvals(rhosp(s))[i], digits = prec) for i in 1:dim(ope(s))], rev=true)
-eigensp(s::State_complex_fixed) = sort([round(eigvals(rhosp(s))[i], digits = prec) for i in 1:dim(ope(s))], rev=true)
-#For some reason, I can not compute eigenvalues
+# I can not compute eigenvalues
 #directly from sparse matrices
 eigensp(s::State_sparse) = sort([round(eigvals(Matrix(rhosp(s)))[i], digits = prec) for i in 1:dim(ope(s))], rev=true)
-eigensp(s::State_sparse_complex) = sort([round(eigvals(Matrix(rhosp(s)))[i], digits = prec) for i in 1:dim(ope(s))], rev=true)
 eigensp(s::State_sparse_fixed) = sort([round(eigvals(Matrix(rhosp(s)))[i], digits = prec) for i in 1:dim(ope(s))], rev=true)
-eigensp(s::State_sparse_complex_fixed) = sort([round(eigvals(Matrix(rhosp(s)))[i], digits = prec) for i in 1:dim(ope(s))], rev=true)
 
 function ssp(sta::State)
-    eigen = eigensp(sta)
-    lene = length(eigen)
-    s = 0
-    for i in 1:lene
-        if eigen[i] != 0 && eigen[i] != 1
-            s = s - (eigen[i]*log(2,eigen[i]) + (1 - eigen[i])*log(2,1-eigen[i]))
-        end
-    end
-    return s/lene
-end
-
-function ssp(sta::State_fixed)
-    eigen = eigensp(sta)
-    lene = length(eigen)
-    s = 0
-    for i in 1:lene
-        if eigen[i] != 0 && eigen[i] != 1
-            s = s - (eigen[i]*log(2,eigen[i]) + (1 - eigen[i])*log(2,1-eigen[i]))
-        end
-    end
-    return s/lene
-end
-
-function ssp(sta::State_complex)
-    eigen = eigensp(sta)
-    lene = length(eigen)
-    s = 0
-    for i in 1:lene
-        if eigen[i] != 0 && eigen[i] != 1
-            s = s - (eigen[i]*log(2,eigen[i]) + (1 - eigen[i])*log(2,1-eigen[i]))
-        end
-    end
-    return s/lene
-end
-
-function ssp(sta::State_complex_fixed)
     eigen = eigensp(sta)
     lene = length(eigen)
     s = 0
@@ -72,31 +32,19 @@ function ssp(sta::State_sparse)
     return s/lene
 end
 
+function ssp(sta::State_fixed)
+    eigen = eigensp(sta)
+    lene = length(eigen)
+    s = 0
+    for i in 1:lene
+        if eigen[i] != 0 && eigen[i] != 1
+            s = s - (eigen[i]*log(2,eigen[i]) + (1 - eigen[i])*log(2,1-eigen[i]))
+        end
+    end
+    return s/lene
+end
+
 function ssp(sta::State_sparse_fixed)
-    eigen = eigensp(sta)
-    lene = length(eigen)
-    s = 0
-    for i in 1:lene
-        if eigen[i] != 0 && eigen[i] != 1
-            s = s - (eigen[i]*log(2, eigen[i]) + (1 - eigen[i])*log(2, 1-eigen[i]))
-        end
-    end
-    return s/lene
-end
-
-function ssp(sta::State_sparse_complex)
-    eigen = eigensp(sta)
-    lene = length(eigen)
-    s = 0
-    for i in 1:lene
-        if eigen[i] != 0 && eigen[i] != 1
-            s = s - (eigen[i]*log(2, eigen[i]) + (1 - eigen[i])*log(2, 1-eigen[i]))
-        end
-    end
-    return s/lene
-end
-
-function ssp(sta::State_sparse_complex_fixed)
     eigen = eigensp(sta)
     lene = length(eigen)
     s = 0
@@ -111,12 +59,9 @@ end
 
 ## Quasi Particles
 eigenqsp(s::State) = sort([round(eigvals(rhoqsp(s))[i], digits = prec) for i in 1:(2*dim(ope(s)))], rev=true)
-eigenqsp(s::State_complex) = sort([round(eigvals(rhoqsp(s))[i], digits = prec) for i in 1:(2*dim(ope(s)))], rev=true)
-#For some reason, I can not compute eigenvalues
+# I can not compute eigenvalues
 #directly from sparse matrices
 eigenqsp(s::State_sparse) = sort([round(eigvals(Matrix(rhoqsp(s)))[i], digits = prec) for i in 1:(2*dim(ope(s)))], rev=true)
-eigenqsp(s::State_sparse_complex) = sort([round(eigvals(Matrix(rhoqsp(s)))[i], digits = prec) for i in 1:(2*dim(ope(s)))], rev=true)
-
 
 function sqsp(sta::State)
     eigen = eigenqsp(sta)
@@ -130,31 +75,7 @@ function sqsp(sta::State)
     return s/lene
 end
 
-function sqsp(sta::State_complex)
-    eigen = eigenqsp(sta)
-    lene = length(eigen)
-    s = 0
-    for i in 1:lene
-        if eigen[i] != 0 && eigen[i] != 1
-            s = s - (eigen[i]*log(2,eigen[i]) + (1 - eigen[i])*log(2,1-eigen[i]))
-        end
-    end
-    return s/lene
-end
-
 function sqsp(sta::State_sparse)
-    eigen = eigenqsp(sta)
-    lene = length(eigen)
-    s = 0
-    for i in 1:lene
-        if eigen[i] != 0 && eigen[i] != 1
-            s = s - (eigen[i]*log(2, eigen[i]) + (1 - eigen[i])*log(2, 1-eigen[i]))
-        end
-    end
-    return s/lene
-end
-
-function sqsp(sta::State_sparse_complex)
     eigen = eigenqsp(sta)
     lene = length(eigen)
     s = 0
@@ -226,7 +147,7 @@ function majorization_qsp(s1, s2)
     end
 end
 
-function n_avg(s::Union{State,State_complex,State_sparse,State_sparse_complex})
+function n_avg(s::Union{State,State_sparse})
     navg = Real(tr(rhosp(s)))
     return navg
 end
@@ -299,8 +220,8 @@ function indx(arr)
 end
 
 
-function cof_mat(o, d, num, m, bas, estat)
-    cmat = zeros(binomial(d,m),binomial(d,num-m))
+function cof_mat(o, d, num, m, bas, estat, ty)
+    cmat = zeros(ty, binomial(d,m),binomial(d,num-m))
     am = sparse([bas[i,:] for i in 1:binomial(d, m)])
     bas_nume_m, _ = basis_m(d, num - m)
     amn = sparse([bas_nume_m[i,:] for i in 1:binomial(d, num-m)])
@@ -352,9 +273,8 @@ function cof_mat_comp(o, d, num, m, bas, estat)
     return cmat
 end
 
-
-function cof_mat_fixed(o, d, num, m, bas, bas_tot, estat)
-    cmat = zeros(binomial(d,m),binomial(d,num-m))
+function cof_mat_fixed(o, d, num, m, bas, bas_tot, estat, ty)
+    cmat = zeros(ty,binomial(d,m),binomial(d,num-m))
     am = sparse([bas[i,:] for i in 1:binomial(d, m)])
     bas_nume_m, _ = basis_m(d, num - m)
     amn = sparse([bas_nume_m[i,:] for i in 1:binomial(d, num-m)])
@@ -422,7 +342,6 @@ function non_diag_ops(o, d, nume, m, bas, i)
     return mel
 end
 
-
 function diag_ops(o, d, nume, m, bas, u, and, i)
     ad = spzeros(2^d, 2^d)
     for j in 1:binomial(d,m)
@@ -433,17 +352,16 @@ function diag_ops(o, d, nume, m, bas, u, and, i)
     return ad
 end
 
-
-
 #main function
 function rhom(s::Union{State,State_sparse}, m::Int64)
     o = ope(s)
     num = Int(round(n_avg(s),digits = 8))
     d = dim(o) #tengo que pasar a matrix lamentablemente
-    rhomd = spzeros(binomial(d, m), binomial(d, m))
+    rhomd = spzeros(typ(s),binomial(d, m), binomial(d, m))
     bas, _ = basis_m(d, m)
     estat = st(s)
-    u, _ = svd(cof_mat(o, d, num, m, bas, estat))
+    ty = typ(s)
+    u, _ = svd(cof_mat(o, d, num, m, bas, estat, ty))
     and = sparse([non_diag_ops(o, d, num, m, bas, j) for j in 1:binomial(d, m)])
     ad = sparse([diag_ops(o, d, num, m, bas, u, and, j) for j in 1:binomial(d, m)])
     #ad[1] es evaluar la funcion diagonal en i=1
@@ -452,55 +370,17 @@ function rhom(s::Union{State,State_sparse}, m::Int64)
     end
     return rhomd
 end
-
-
-#main function
-function rhom(s::Union{State_complex,State_sparse_complex}, m::Int64)
-    o = ope(s)
-    num = Int(round(n_avg(s),digits = 8))
-    d = dim(o) #tengo que pasar a matrix lamentablemente
-    rhomd = spzeros(Complex{Float64},binomial(d, m), binomial(d, m))
-    bas, _ = basis_m(d, m)
-    estat = st(s)
-    u, _ = svd(cof_mat_comp(o, d, num, m, bas, estat))
-    and = sparse([non_diag_ops(o, d, num, m, bas, j) for j in 1:binomial(d, m)])
-    ad = sparse([diag_ops(o, d, num, m, bas, u, and, j) for j in 1:binomial(d, m)])
-    #ad[1] es evaluar la funcion diagonal en i=1
-    for i in 1:binomial(d, m)
-        rhomd[i,i] = round(estat'*ad[i]*ad[i]'*estat, digits = 14)
-    end
-    return rhomd
-end
-
 
 function rhom(s::Union{State_fixed,State_sparse_fixed}, m::Int64)
     o = ope(s)
     num = nume(s)
     d = dim(o) #tengo que pasar a matrix lamentablemente
-    rhomd = spzeros(binomial(d, m), binomial(d, m))
+    rhomd = spzeros(typ(s),binomial(d, m), binomial(d, m))
     bas_tot, _ = basis_m(d, num)
     bas, _ = basis_m(d, m)
     estat = st(s)
-    u, _ = svd(cof_mat_fixed(o, d, num, m, bas, bas_tot, estat))
-    and = sparse([non_diag_ops(o, d, num, m, bas, i) for i in 1:binomial(d, m)])
-    ad = sparse([diag_ops(o, d, num, m, bas, u, and, i) for i in 1:binomial(d, m)])
-    #ad[1] es evaluar la funcion diagonal en i=1
-    for i in 1:binomial(d, m)
-        rhomd[i,i] = round(estat'*fixed(ad[i]*ad[i]',num)*estat, digits = 14)
-    end
-    return rhomd
-end
-
-
-function rhom(s::Union{State_complex_fixed,State_sparse_complex_fixed}, m::Int64)
-    o = ope(s)
-    num = nume(s)
-    d = dim(o) #tengo que pasar a matrix lamentablemente
-    rhomd = spzeros(Complex{Float64},binomial(d, m), binomial(d, m))
-    bas_tot, _ = basis_m(d, num)
-    bas, _ = basis_m(d, m)
-    estat = st(s)
-    u, _ = svd(cof_mat_fixed_comp(o, d, num, m, bas, bas_tot, estat))
+    ty = typ(s)
+    u, _ = svd(cof_mat_fixed(o, d, num, m, bas, bas_tot, estat, ty))
     and = sparse([non_diag_ops(o, d, num, m, bas, i) for i in 1:binomial(d, m)])
     ad = sparse([diag_ops(o, d, num, m, bas, u, and, i) for i in 1:binomial(d, m)])
     #ad[1] es evaluar la funcion diagonal en i=1
@@ -516,7 +396,7 @@ function rhomnd(s::Union{State,State_sparse}, m::Int64)
     o = ope(s)
     num = Int(round(n_avg(s),digits = 8))
     d = dim(o) #tengo que pasar a matrix lamentablemente
-    rhomd = spzeros(binomial(d, m), binomial(d, m))
+    rhomd = spzeros(typ(s),binomial(d, m), binomial(d, m))
     bas,_ = basis_m(d, m)
     estat = st(s)
     and = sparse([non_diag_ops(o, d, num, m, bas, j) for j in 1:binomial(d, m)])
@@ -528,22 +408,6 @@ function rhomnd(s::Union{State,State_sparse}, m::Int64)
     return rhomd
 end
 
-#main function
-function rhomnd(s::Union{State_complex,State_sparse_complex}, m::Int64)
-    o = ope(s)
-    num = Int(round(n_avg(s),digits = 8))
-    d = dim(o) #tengo que pasar a matrix lamentablemente
-    rhomd = spzeros(Complex{Float64},binomial(d, m), binomial(d, m))
-    bas, _ = basis_m(d, m)
-    estat = st(s)
-    and = sparse([non_diag_ops(o, d, num, m, bas, j) for j in 1:binomial(d, m)])
-    for i in 1:binomial(d, m)
-        for j in 1:binomial(d,m)
-            rhomd[i,j] = round(estat'*and[j]*and[i]'*estat, digits = 14)
-        end
-    end
-    return rhomd
-end
 
 #= Work in Progress: non diagonal operators with fixed states
 function rhomnd(s::Union{State_fixed,State_sparse_fixed}, m::Int64)
@@ -586,7 +450,7 @@ function trp(state::Union{State,State_sparse},modos::Array{Int64,1})
     bas = basis(ope(state))
     sta = st(state)
     lm = length(modos)
-    zvr = zeros(2^lm,2^(d-lm))
+    zvr = zeros(typ(state),2^lm,2^(d-lm))
     full = [i for i in 1:d]
     lista = sort(modos)
     listb = filter(x->x ∉ lista,full)
@@ -606,35 +470,6 @@ function trp(state::Union{State,State_sparse},modos::Array{Int64,1})
         zvr[indicea,indiceb]=sta[k]*sign
     end
     rhoa=zvr*zvr'
-    #rhob=zvr'*zvr;
-    return rhoa
-end
-
-function trp(state::Union{State_complex,State_sparse_complex},modos::Array{Int64,1})
-    d = dim(ope(state))
-    bas = basis(ope(state))
-    sta = st(state)
-    lm = length(modos)
-    zvr = zeros(Complex{Float64},2^lm,2^(d-lm))
-    full = [i for i in 1:d]
-    lista = sort(modos)
-    listb = filter(x->x ∉ lista,full)
-    for k in 1:2^d
-        indicea=parse(Int,join([Int(bas[k,i]) for i in lista]), base=2)+1
-        indiceb=parse(Int,join([Int(bas[k,i]) for i in listb]), base=2)+1
-        signi = 0
-        for i in lista
-            listac = filter(x->x <= i-1,listb)
-            signl = 0
-            for l in listac
-                signl = signl+bas[k,l]
-            end
-            signi = signi + signl*bas[k,i]
-        end
-        sign = (-1)^(signi)
-        zvr[indicea,indiceb]=sta[k]*sign
-    end
-    rhoa=zvr*conj(zvr')
     #rhob=zvr'*zvr;
     return rhoa
 end
