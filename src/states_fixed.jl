@@ -12,20 +12,6 @@ struct State_sparse_fixed{T}
     nume::Int64
 end
 
-# These 2 structs will be deleted after changing all
-# dependancies
-struct State_complex_fixed
-    st::Array{Complex{Float64},1}
-    ope::Op
-    nume::Int64
-end;
-
-struct State_sparse_complex_fixed
-    st::SparseVector{Complex{Float64},Int64}
-    ope::Op
-    nume::Int64
-end;
-
 st(s::State_fixed) = s.st
 st(s::State_sparse_fixed) = s.st
 

@@ -10,18 +10,6 @@ struct State_sparse{T}
     ope::Op
 end
 
-# These 2 structs will be deleted after changing all
-# dependancies
-struct State_complex
-    st::Array{Complex{Float64},1}
-    ope::Op
-end
-
-struct State_sparse_complex
-    st::SparseVector{Complex{Float64},Int64}
-    ope::Op
-end
-
 st(s::State) = s.st
 st(s::State_sparse) = s.st
 

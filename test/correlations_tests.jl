@@ -11,7 +11,7 @@ using Test
     @test ssp(State_fixed(1/sqrt(2)*[1,0,0,0,0,im],Op(4),2)) == 1.0
     @test ssp(State_fixed(1/sqrt(2)*[1,0,0,0,0,1],Op(4),2)) == 1.0
     @test ssp(State_sparse_fixed(spzeros(6),Op(4),2)) == 0
-    @test ssp(State_sparse_fixed(sparse([1,6],[1,1],[1/sqrt(2),im/sqrt(2)]),Op(4),2)) == 1.0
+    @test ssp(State_sparse_fixed(SparseVector(sparse([1,6],[1,1],[1/sqrt(2),im/sqrt(2)])),Op(4),2)) == 1.0
     @test sqsp(State_sparse(spzeros(16), Op(4))) == 0
     @test sqsp(State([0,0,0,1/sqrt(2),0,0,0,0,0,0,0,0,1/sqrt(2),0,0,0],Op(4))) == 1.0
     @test sqsp(State([0,0,0,im/2,0,0,0,0,0,0,0,0,sqrt(3)/2,0,0,0],Op(4))) == 0.8112781244591327
