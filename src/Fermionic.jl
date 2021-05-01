@@ -12,10 +12,10 @@ include("operators_fixed.jl")
 include("mixed.jl")
 
 export Op, dim, basis, cm, cdm, cdcm, cmcd, cmcm, cdcd, vacuum
-export State, State_sparse, st, ope, typ, rhosp, rhoqsp
+export State, st, ope, typ, rhosp, rhoqsp
 export eigensp, ssp, eigenqsp, sqsp, majorization_sp, majorization_qsp, n_avg, rhom, rhomnd, trp
 export sigma_x, sigma_y, sigma_z, phase, hadamard, ucnot, swap
 export fixed, basis_m, fixed_state, unfixed, cdc, ccd
-export State_fixed, State_sparse_fixed, State_complex_fixed, State_sparse_complex_fixed, nume
+export State_fixed, nume
 export rhosp_mixed, eigensp_mixed
 end # module
