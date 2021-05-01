@@ -6,12 +6,6 @@ struct State_fixed{T<:AbstractVector}
     nume::Int64
 end
 
-struct State_sparse_fixed{T}
-    st::SparseVector{T,Int64}
-    ope::Op
-    nume::Int64
-end
-
 st(s::State_fixed) = s.st
 
 ope(s::State_fixed) = s.ope

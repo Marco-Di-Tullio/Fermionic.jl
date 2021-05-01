@@ -1,12 +1,10 @@
 prec = 15 #precision
 
 ##Single Particle
-eigensp(s::State) = sort([round(eigvals(rhosp(s))[i], digits = prec) for i in 1:dim(ope(s))], rev=true)
-eigensp(s::State_fixed) = sort([round(eigvals(rhosp(s))[i], digits = prec) for i in 1:dim(ope(s))], rev=true)
+eigensp(s::State) = sort([round(eigvals(Matrix(rhosp(s)))[i], digits = prec) for i in 1:dim(ope(s))], rev=true)
+eigensp(s::State_fixed) = sort([round(eigvals(Matrix(rhosp(s)))[i], digits = prec) for i in 1:dim(ope(s))], rev=true)
 # I can not compute eigenvalues
 #directly from sparse matrices
-eigensp(s::State_sparse) = sort([round(eigvals(Matrix(rhosp(s)))[i], digits = prec) for i in 1:dim(ope(s))], rev=true)
-eigensp(s::State_sparse_fixed) = sort([round(eigvals(Matrix(rhosp(s)))[i], digits = prec) for i in 1:dim(ope(s))], rev=true)
 
 function ssp(sta::State)
     eigen = eigensp(sta)
@@ -15,18 +13,6 @@ function ssp(sta::State)
     for i in 1:lene
         if eigen[i] != 0 && eigen[i] != 1
             s = s - (eigen[i]*log(2,eigen[i]) + (1 - eigen[i])*log(2,1-eigen[i]))
-        end
-    end
-    return s/lene
-end
-
-function ssp(sta::State_sparse)
-    eigen = eigensp(sta)
-    lene = length(eigen)
-    s = 0
-    for i in 1:lene
-        if eigen[i] != 0 && eigen[i] != 1
-            s = s - (eigen[i]*log(2, eigen[i]) + (1 - eigen[i])*log(2, 1-eigen[i]))
         end
     end
     return s/lene
@@ -43,25 +29,10 @@ function ssp(sta::State_fixed)
     end
     return s/lene
 end
-
-function ssp(sta::State_sparse_fixed)
-    eigen = eigensp(sta)
-    lene = length(eigen)
-    s = 0
-    for i in 1:lene
-        if eigen[i] != 0 && eigen[i] != 1
-            s = s - (eigen[i]*log(2, eigen[i]) + (1 - eigen[i])*log(2, 1-eigen[i]))
-        end
-    end
-    return s/lene
-end
-
-
 ## Quasi Particles
-eigenqsp(s::State) = sort([round(eigvals(rhoqsp(s))[i], digits = prec) for i in 1:(2*dim(ope(s)))], rev=true)
+eigenqsp(s::State) = sort([round(eigvals(Matrix(rhoqsp(s)))[i], digits = prec) for i in 1:(2*dim(ope(s)))], rev=true)
 # I can not compute eigenvalues
 #directly from sparse matrices
-eigenqsp(s::State_sparse) = sort([round(eigvals(Matrix(rhoqsp(s)))[i], digits = prec) for i in 1:(2*dim(ope(s)))], rev=true)
 
 function sqsp(sta::State)
     eigen = eigenqsp(sta)
@@ -70,18 +41,6 @@ function sqsp(sta::State)
     for i in 1:lene
         if eigen[i] != 0 && eigen[i] != 1
             s = s - (eigen[i]*log(2,eigen[i]) + (1 - eigen[i])*log(2,1-eigen[i]))
-        end
-    end
-    return s/lene
-end
-
-function sqsp(sta::State_sparse)
-    eigen = eigenqsp(sta)
-    lene = length(eigen)
-    s = 0
-    for i in 1:lene
-        if eigen[i] != 0 && eigen[i] != 1
-            s = s - (eigen[i]*log(2, eigen[i]) + (1 - eigen[i])*log(2, 1-eigen[i]))
         end
     end
     return s/lene
@@ -146,7 +105,7 @@ function majorization_qsp(s1, s2)
     end
 end
 
-function n_avg(s::Union{State,State_sparse})
+function n_avg(s::State)
     navg = Real(tr(rhosp(s)))
     return navg
 end
@@ -200,7 +159,6 @@ function indx(arr)
     end
     return ind
 end
-
 
 function cof_mat(o, d, num, m, bas, estat, ty)
     cmat = zeros(ty, binomial(d,m),binomial(d,num-m))
@@ -278,7 +236,7 @@ function diag_ops(o, d, nume, m, bas, u, and, i)
 end
 
 #main function
-function rhom(s::Union{State,State_sparse}, m::Int64)
+function rhom(s::State, m::Int64)
     o = ope(s)
     num = Int(round(n_avg(s),digits = 8))
     d = dim(o) #tengo que pasar a matrix lamentablemente
@@ -296,7 +254,7 @@ function rhom(s::Union{State,State_sparse}, m::Int64)
     return rhomd
 end
 
-function rhom(s::Union{State_fixed,State_sparse_fixed}, m::Int64)
+function rhom(s::State_fixed, m::Int64)
     o = ope(s)
     num = nume(s)
     d = dim(o) #tengo que pasar a matrix lamentablemente
@@ -317,7 +275,7 @@ end
 
 #The following are the rhom matrices without diagonalization
 # i.e. in the original basis
-function rhomnd(s::Union{State,State_sparse}, m::Int64)
+function rhomnd(s::State, m::Int64)
     o = ope(s)
     num = Int(round(n_avg(s),digits = 8))
     d = dim(o) #tengo que pasar a matrix lamentablemente
@@ -369,7 +327,7 @@ end
 =#
 
 #Partial trace in a given basis of modes
-function trp(state::Union{State,State_sparse},modos::Array{Int64,1})
+function trp(state::State, modos::Array{Int64,1})
     d = dim(ope(state))
     bas = basis(ope(state))
     sta = st(state)

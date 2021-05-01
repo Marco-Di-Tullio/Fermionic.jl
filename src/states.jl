@@ -5,11 +5,6 @@ struct State{T<:AbstractVector}
     ope::Op
 end
 
-struct State_sparse{T}
-    st::SparseVector{T,Int64}
-    ope::Op
-end
-
 st(s::State) = s.st
 
 ope(s::State) = s.ope
