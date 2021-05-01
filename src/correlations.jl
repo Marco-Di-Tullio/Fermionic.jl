@@ -2,7 +2,6 @@ prec = 15 #precision
 
 ##Single Particle
 eigensp(s::State) = sort([round(eigvals(Matrix(rhosp(s)))[i], digits = prec) for i in 1:dim(ope(s))], rev=true)
-eigensp(s::State_fixed) = sort([round(eigvals(Matrix(rhosp(s)))[i], digits = prec) for i in 1:dim(ope(s))], rev=true)
 # I can not compute eigenvalues
 #directly from sparse matrices
 
@@ -18,17 +17,6 @@ function ssp(sta::State)
     return s/lene
 end
 
-function ssp(sta::State_fixed)
-    eigen = eigensp(sta)
-    lene = length(eigen)
-    s = 0
-    for i in 1:lene
-        if eigen[i] != 0 && eigen[i] != 1
-            s = s - (eigen[i]*log(2,eigen[i]) + (1 - eigen[i])*log(2,1-eigen[i]))
-        end
-    end
-    return s/lene
-end
 ## Quasi Particles
 eigenqsp(s::State) = sort([round(eigvals(Matrix(rhoqsp(s)))[i], digits = prec) for i in 1:(2*dim(ope(s)))], rev=true)
 # I can not compute eigenvalues
