@@ -1,5 +1,4 @@
 #states constructors
-
 struct State{T<:AbstractVector}
     st::T
     ope::Op
