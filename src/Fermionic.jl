@@ -13,7 +13,7 @@ include("mixed.jl")
 
 export Op, dim, basis, cm, cdm, cdcm, cmcd, cmcm, cdcd, vacuum
 export State, State2, st, ope, typ, rhosp, rhoqsp
-export eigensp, ssp, eigenqsp, sqsp, majorization_sp, majorization_qsp, n_avg, rhom, rhomnd, trp
+export eigensp, ssp, eigenqsp, sqsp, majorization_sp, majorization_qsp, n_avg, rhom, rhomd, trp
 export sigma_x, sigma_y, sigma_z, phase, hadamard, ucnot, swap
 export fixed, basis_m, fixed_state, unfixed, cdc, ccd
 export State_fixed, nume
