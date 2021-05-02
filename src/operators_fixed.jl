@@ -20,7 +20,7 @@ function fixed_state(sta::State, nume::Int64)
     n = Int(log(2,length(stat)))
     posn = ffilter(n, nume)
     reduced = stat[setdiff(1:end,posn)]
-    return State(reduced,o,nume)
+    return State_fixed(reduced,o,nume)
 end
 
 # This functions takes stat, an array
@@ -36,7 +36,7 @@ function unfixed_state(stat::AbstractVector, index, d::Int64)
     return state2n
 end
 
-function unfixed_state(sta::State, index, d::Int64)
+function unfixed_state(sta::State_fixed, index, d::Int64)
     stat = st(sta)
     l = size(stat)[1]
     state2n = zeros(2^d)
