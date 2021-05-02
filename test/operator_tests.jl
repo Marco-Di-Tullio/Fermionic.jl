@@ -16,4 +16,5 @@ using Test
     @test ccd(basis_m(4,2)[1],basis_m(4,2)[2],1,2)[2,4]==1
     @test ccd(6,2,1,2)[8,12] == 1.0
     @test unfixed_state([0,0,0,0,1/sqrt(2),1/sqrt(2)],basis_m(4,2)[2],4)[13] == 1/sqrt(2)
+    @test st(unfixed_state(State([0,0,0,0,0,1],Op(4),2),basis_m(4,2)[2],4))[13] == 1
 end
