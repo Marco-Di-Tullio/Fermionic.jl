@@ -2,6 +2,7 @@ prec = 15 #precision
 
 ##Single Particle
 eigensp(s::State) = sort([round(eigvals(Matrix(rhosp(s)))[i], digits = prec) for i in 1:dim(ope(s))], rev=true)
+eigensp(s::State_fixed) = sort([round(eigvals(Matrix(rhosp(s)))[i], digits = prec) for i in 1:dim(ope(s))], rev=true)
 # I can not compute eigenvalues
 #directly from sparse matrices
 
@@ -17,6 +18,17 @@ function ssp(sta::State)
     return s/lene
 end
 
+function ssp(sta::State_fixed)
+    eigen = eigensp(sta)
+    lene = length(eigen)
+    s = 0
+    for i in 1:lene
+        if eigen[i] != 0 && eigen[i] != 1
+            s = s - (eigen[i]*log(2,eigen[i]) + (1 - eigen[i])*log(2,1-eigen[i]))
+        end
+    end
+    return s/lene
+end
 ## Quasi Particles
 eigenqsp(s::State) = sort([round(eigvals(Matrix(rhoqsp(s)))[i], digits = prec) for i in 1:(2*dim(ope(s)))], rev=true)
 # I can not compute eigenvalues
@@ -134,75 +146,77 @@ end
 =#
 
 ####################################################
+#The following are the rhom matrices without diagonalization
+# i.e. in the original basis
+function rhom(s::State, m::Int64)
+    o = ope(s)
+    num = Int(round(n_avg(s),digits = 8))
+    d = dim(o) #tengo que pasar a matrix lamentablemente
+    rhomd = spzeros(typ(s),binomial(d, m), binomial(d, m))
+    bas,_ = basis_m(d, m)
+    estat = st(s)
+    and = sparse([non_diag_ops(o, d, num, m, bas, j) for j in 1:binomial(d, m)])
+    for i in 1:binomial(d, m)
+        for j in 1:binomial(d,m)
+            rhomd[i,j] = round(estat'*and[j]*and[i]'*estat, digits = 14)
+        end
+    end
+    return rhomd
+end
+
+function rhom(s::State_fixed, m::Int64)
+    o = ope(s)
+    num = nume(s)
+    d = dim(o) #tengo que pasar a matrix lamentablemente
+    rhomd = spzeros(typ(s),binomial(d, m), binomial(d, m))
+    bas,_ = basis_m(d, m)
+    estat = st(s)
+    and = sparse([non_diag_ops(o, d, num, m, bas, j) for j in 1:binomial(d, m)])
+    for i in 1:binomial(d, m)
+        for j in 1:binomial(d,m)
+            rhomd[i,j] = round(estat'*fixed(and[j]*and[i]',num)*estat, digits = 14)
+        end
+    end
+    return rhomd
+end
 
 #main function
 function rhomd(s::State, m::Int64)
     o = ope(s)
     num = Int(round(n_avg(s),digits = 8))
-    numm = nume(s)
+    d = dim(o) #tengo que pasar a matrix lamentablemente
+    rhomd = spzeros(typ(s),binomial(d, m), binomial(d, m))
+    bas, _ = basis_m(d, m)
+    estat = st(s)
+    ty = typ(s)
+    u, _ = svd(cof_mat(o, d, num, m, bas, estat, ty))
+    and = sparse([non_diag_ops(o, d, num, m, bas, j) for j in 1:binomial(d, m)])
+    ad = sparse([diag_ops(o, d, num, m, bas, u, and, j) for j in 1:binomial(d, m)])
+    #ad[1] es evaluar la funcion diagonal en i=1
+    for i in 1:binomial(d, m)
+        rhomd[i,i] = round(estat'*ad[i]*ad[i]'*estat, digits = 14)
+    end
+    return rhomd
+end
+
+function rhomd(s::State_fixed, m::Int64)
+    o = ope(s)
+    num = nume(s)
     d = dim(o) #tengo que pasar a matrix lamentablemente
     rhomd = spzeros(typ(s),binomial(d, m), binomial(d, m))
     bas_tot, _ = basis_m(d, num)
     bas, _ = basis_m(d, m)
     estat = st(s)
     ty = typ(s)
-    u, _ = svd(cof_mat(o, d, num, m, bas, bas_tot, estat, ty, numm))
-    and = sparse([non_diag_ops(o, d, num, m, bas, j) for j in 1:binomial(d, m)])
-    ad = sparse([diag_ops(o, d, num, m, bas, u, and, j) for j in 1:binomial(d, m)])
+    u, _ = svd(cof_mat_fixed(o, d, num, m, bas, bas_tot, estat, ty))
+    and = sparse([non_diag_ops(o, d, num, m, bas, i) for i in 1:binomial(d, m)])
+    ad = sparse([diag_ops(o, d, num, m, bas, u, and, i) for i in 1:binomial(d, m)])
     #ad[1] es evaluar la funcion diagonal en i=1
-    if isequal(numm,missing)
-        for i in 1:binomial(d, m)
-            rhomd[i,i] = round(estat'*ad[i]*ad[i]'*estat, digits = 14)
-        end
-    else
-        if length(estat) == binomial(d,num)
-            for i in 1:binomial(d, m)
-                rhomd[i,i] = round(estat'*fixed(ad[i]*ad[i]',num)*estat, digits = 14)
-            end
-        else
-            for i in 1:binomial(d, m)
-                rhomd[i,i] = round(estat'*ad[i]*ad[i]'*estat, digits = 14)
-            end
-        end
+    for i in 1:binomial(d, m)
+        rhomd[i,i] = round(estat'*fixed(ad[i]*ad[i]',num)*estat, digits = 14)
     end
     return rhomd
 end
-
-#The following are the rhom matrices without diagonalization
-# i.e. in the original basis
-function rhom(s::State, m::Int64)
-    o = ope(s)
-    num = Int(round(n_avg(s),digits = 8))
-    numm = nume(s)
-    d = dim(o) #tengo que pasar a matrix lamentablemente
-    rhomd = spzeros(typ(s),binomial(d, m), binomial(d, m))
-    bas,_ = basis_m(d, m)
-    estat = st(s)
-    and = sparse([non_diag_ops(o, d, num, m, bas, j) for j in 1:binomial(d, m)])
-    if isequal(numm,missing)
-        for i in 1:binomial(d, m)
-            for j in 1:binomial(d,m)
-                rhomd[i,j] = round(estat'*and[j]*and[i]'*estat, digits = 14)
-            end
-        end
-    else
-        if length(estat) == binomial(d,num)
-            for i in 1:binomial(d, m)
-                for j in 1:binomial(d,m)
-                    rhomd[i,j] = round(estat'*fixed(and[j]*and[i]',num)*estat, digits = 14)
-                end
-            end
-        else
-            for i in 1:binomial(d, m)
-                for j in 1:binomial(d,m)
-                    rhomd[i,j] = round(estat'*and[j]*and[i]'*estat, digits = 14)
-                end
-            end
-        end
-    end
-    return rhomd
-end
-
 
 #the following are m-body matrices: work on progress
 #for example, for a vector [0,1,0,0,1]->[2,5]
@@ -217,7 +231,7 @@ function indx(arr)
     return ind
 end
 
-function cof_mat(o, d, num, m, bas, bas_tot, estat, ty, numm)
+function cof_mat(o, d, num, m, bas, estat, ty)
     cmat = zeros(ty, binomial(d,m),binomial(d,num-m))
     am = sparse([bas[i,:] for i in 1:binomial(d, m)])
     bas_nume_m, _ = basis_m(d, num - m)
@@ -235,21 +249,37 @@ function cof_mat(o, d, num, m, bas, bas_tot, estat, ty, numm)
                     permut = permut + sum(aj[1:floor(Int,indi[k]-1)])
                 end
                 indij = indx(ai+aj)
-                if isequal(numm,missing)
-                    elem = Int(sum([2^(d-i) for i in indij]) + 1)
-                    cmat[i,j] = estat[elem] * (-1)^permut
-                else
-                    if length(estat) == binomial(d,num)
-                        elem = 1
-                        while indx(bas_tot[elem,:]) != indij
-                            elem = elem + 1
-                        end
-                        cmat[i,j] = estat[elem] * (-1)^permut
-                    else
-                        elem = Int(sum([2^(d-i) for i in indij]) + 1)
-                        cmat[i,j] = estat[elem] * (-1)^permut
-                    end
+                elem = Int(sum([2^(d-i) for i in indij]) + 1)
+                cmat[i,j] = estat[elem] * (-1)^permut
+            end
+        end
+    end
+    return cmat
+end
+
+function cof_mat_fixed(o, d, num, m, bas, bas_tot, estat, ty)
+    cmat = zeros(ty,binomial(d,m),binomial(d,num-m))
+    am = sparse([bas[i,:] for i in 1:binomial(d, m)])
+    bas_nume_m, _ = basis_m(d, num - m)
+    amn = sparse([bas_nume_m[i,:] for i in 1:binomial(d, num-m)])
+    for i in 1:binomial(d, m)
+        ai = am[i]
+        indi = indx(ai)
+        for j in 1:binomial(d, num-m)
+            aj = amn[j]
+            if ai'*aj != 0
+                cmat[i,j] = 0
+            else
+                permut = 0
+                for k in 1:length(indi)
+                    permut = permut + sum(aj[1:floor(Int,indi[k]-1)])
                 end
+                indij = indx(ai+aj)
+                elem = 1
+                while indx(bas_tot[elem,:]) != indij
+                    elem = elem + 1
+                end
+                cmat[i,j] = estat[elem] * (-1)^permut
             end
         end
     end
