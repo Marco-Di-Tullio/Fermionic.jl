@@ -1,9 +1,4 @@
 #states constructors
-struct State_old{T<:AbstractVector}
-    st::T
-    ope::Op
-end
-
 mutable struct State{T<:AbstractVector}
     st::T
     ope::Op

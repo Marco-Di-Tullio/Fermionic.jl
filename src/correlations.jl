@@ -135,7 +135,6 @@ end
 
 ####################################################
 
-
 #main function
 function rhomd(s::State, m::Int64)
     o = ope(s)
@@ -168,25 +167,6 @@ function rhomd(s::State, m::Int64)
     end
     return rhomd
 end
-#
-# function rhom(s::State_fixed, m::Int64)
-#     o = ope(s)
-#     num = nume(s)
-#     d = dim(o) #tengo que pasar a matrix lamentablemente
-#     rhomd = spzeros(typ(s),binomial(d, m), binomial(d, m))
-#     bas_tot, _ = basis_m(d, num)
-#     bas, _ = basis_m(d, m)
-#     estat = st(s)
-#     ty = typ(s)
-#     u, _ = svd(cof_mat_fixed(o, d, num, m, bas, bas_tot, estat, ty))
-#     and = sparse([non_diag_ops(o, d, num, m, bas, i) for i in 1:binomial(d, m)])
-#     ad = sparse([diag_ops(o, d, num, m, bas, u, and, i) for i in 1:binomial(d, m)])
-#     #ad[1] es evaluar la funcion diagonal en i=1
-#     for i in 1:binomial(d, m)
-#         rhomd[i,i] = round(estat'*fixed(ad[i]*ad[i]',num)*estat, digits = 14)
-#     end
-#     return rhomd
-# end
 
 #The following are the rhom matrices without diagonalization
 # i.e. in the original basis
@@ -275,35 +255,6 @@ function cof_mat(o, d, num, m, bas, bas_tot, estat, ty, numm)
     end
     return cmat
 end
-#
-# function cof_mat_fixed(o, d, num, m, bas, bas_tot, estat, ty)
-#     cmat = zeros(ty,binomial(d,m),binomial(d,num-m))
-#     am = sparse([bas[i,:] for i in 1:binomial(d, m)])
-#     bas_nume_m, _ = basis_m(d, num - m)
-#     amn = sparse([bas_nume_m[i,:] for i in 1:binomial(d, num-m)])
-#     for i in 1:binomial(d, m)
-#         ai = am[i]
-#         indi = indx(ai)
-#         for j in 1:binomial(d, num-m)
-#             aj = amn[j]
-#             if ai'*aj != 0
-#                 cmat[i,j] = 0
-#             else
-#                 permut = 0
-#                 for k in 1:length(indi)
-#                     permut = permut + sum(aj[1:floor(Int,indi[k]-1)])
-#                 end
-#                 indij = indx(ai+aj)
-#                 elem = 1
-#                 while indx(bas_tot[elem,:]) != indij
-#                     elem = elem + 1
-#                 end
-#                 cmat[i,j] = estat[elem] * (-1)^permut
-#             end
-#         end
-#     end
-#     return cmat
-# end
 
 function non_diag_ops(o, d, nume, m, bas, i)
     vec = indx(bas[i, :])
