@@ -1,4 +1,4 @@
-function rhosp_mixed(probs::Array{Float64,1}, states::Union{Array{State,1},Array{State_fixed,1}})
+function rhosp_mixed(probs::Array{Float64,1}, states::Array{State,1})
     if round(sum(probs), digits=15) != 1
         throw(ArgumentError("Your probabilities must add up to 1!"))
     end
@@ -20,7 +20,7 @@ function rhosp_mixed(probs::Array{Float64,1}, states::Union{Array{State,1},Array
 end
 
 
-function eigensp_mixed(probs::Array{Float64,1}, states::Union{Array{State,1},Array{State_fixed,1}})
+function eigensp_mixed(probs::Array{Float64,1}, states::Array{State,1})
     if round(sum(probs), digits=15) != 1
         throw(ArgumentError("Your probabilities must add up to 1!"))
     end
