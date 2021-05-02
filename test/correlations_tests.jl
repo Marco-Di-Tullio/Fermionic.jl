@@ -23,8 +23,10 @@ using Test
     @test rhomd(State(1/sqrt(2)*(im*cdm(Op(6),1)*cdm(Op(6),2)*cdm(Op(6),3)*cdm(Op(6),4)+cdm(Op(6),3)*cdm(Op(6),4)*cdm(Op(6),5)*cdm(Op(6),6))*vacuum(Op(6)),Op(6)),2)[3,3] == 0.5
     @test rhomd(State(fixed_state(1/sqrt(2)*(cdm(Op(6),1)*cdm(Op(6),2)*cdm(Op(6),3)*cdm(Op(6),4)+cdm(Op(6),3)*cdm(Op(6),4)*cdm(Op(6),5)*cdm(Op(6),6))*vacuum(Op(6)),4),Op(6),4),2)[6,6] == 0.5
     @test rhomd(State(fixed_state(1/sqrt(2)*(im*cdm(Op(6),1)*cdm(Op(6),2)*cdm(Op(6),3)*cdm(Op(6),4)+cdm(Op(6),3)*cdm(Op(6),4)*cdm(Op(6),5)*cdm(Op(6),6))*vacuum(Op(6)),4),Op(6),4),2)[1,1] == 1.0
+    @test rhom(State(fixed_state(1/sqrt(2)*(im*cdm(Op(6),1)*cdm(Op(6),2)*cdm(Op(6),3)*cdm(Op(6),4)+cdm(Op(6),3)*cdm(Op(6),4)*cdm(Op(6),5)*cdm(Op(6),6))*vacuum(Op(6)),4),Op(6),4),2)[1,15] == -0.5im
     @test rhom(State(1/sqrt(2)*(cdm(Op(6),1)*cdm(Op(6),2)*cdm(Op(6),3)*cdm(Op(6),4)+cdm(Op(6),3)*cdm(Op(6),4)*cdm(Op(6),5)*cdm(Op(6),6))*vacuum(Op(6)),Op(6)),2)[15,1] == 0.5
     @test rhom(State(1/sqrt(2)*(im*cdm(Op(6),1)*cdm(Op(6),2)*cdm(Op(6),3)*cdm(Op(6),4)+cdm(Op(6),3)*cdm(Op(6),4)*cdm(Op(6),5)*cdm(Op(6),6))*vacuum(Op(6)),Op(6)),2)[4,4] == 0.5
+    @test rhom(State(1/sqrt(2)*(cdm(Op(6),1)*cdm(Op(6),2)*cdm(Op(6),3)*cdm(Op(6),4)+cdm(Op(6),3)*cdm(Op(6),4)*cdm(Op(6),5)*cdm(Op(6),6))*vacuum(Op(6)),Op(6),2),2)[1,15] == 0.5
     @test trp(State(spzeros(16), Op(4)),[1])[1,1] == 0
     @test round(trp(State([0,0,0,1/sqrt(2),0,0,0,0,0,0,0,0,1/sqrt(2),0,0,0],Op(4)),[2,4])[2,2],digits=5) == 0.5
     @test round(trp(State([0,0,0,im/sqrt(2),0,0,0,0,0,0,0,0,1/sqrt(2),0,0,0],Op(4)),[1,4])[2,2],digits=5) == 0.5

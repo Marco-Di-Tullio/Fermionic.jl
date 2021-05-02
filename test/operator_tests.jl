@@ -12,9 +12,11 @@ using Test
     @test basis_m(8,2)[2][4] == 10.0
     @test cdc(6,2,3,3)[6,6] == 1.0
     @test cdc(6,2,3,2)[14,15] == 1.0
-    @test cdc(basis_m(4,2)[1],basis_m(4,2)[2],1,2)[4,2]==1
-    @test ccd(basis_m(4,2)[1],basis_m(4,2)[2],1,2)[2,4]==1
+    @test cdc(basis_m(4,2)[1],basis_m(4,2)[2],1,2)[4,2] == 1
+    @test ccd(basis_m(4,2)[1],basis_m(4,2)[2],1,2)[2,4] == 1
     @test ccd(6,2,1,2)[8,12] == 1.0
+    @test cdc(basis_m(4,2)[1],basis_m(4,2)[2],3,3)[5,5] == 1
+    @test fixed_state([0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],2)[6] == 1
     @test unfixed_state([0,0,0,0,1/sqrt(2),1/sqrt(2)],basis_m(4,2)[2],4)[13] == 1/sqrt(2)
     @test st(unfixed_state(State([0,0,0,0,0,1],Op(4),2),basis_m(4,2)[2],4))[13] == 1
 end
