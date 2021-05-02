@@ -17,6 +17,7 @@ using Test
     @test_throws ArgumentError phase(Op(3),4,pi)
     @test swap(Op(3),1,2)[3,5] == 1.0
     @test_throws ArgumentError swap(Op(3),1,4)
+    @test_throws ArgumentError swap(Op(3),1,1)
     @test swap(Op(5),1,2)[5,6] == 0.0
     @test swap(Op(3),1,2)[8,8] == -1.0
     @test sigma_x(Op(3),2)[1,3] == 1.0
