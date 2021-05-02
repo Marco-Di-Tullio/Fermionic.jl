@@ -49,7 +49,7 @@ end
 
 # The following function outputs the basis with fixed_state
 # particle number together with the indices
-function basis_m(n,m)
+function basis_m(n::Int64,m::Int64)
     len = binomial(n,m)
     rowb = spzeros(m*len)
     colb = spzeros(m*len)

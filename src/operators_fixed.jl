@@ -27,7 +27,8 @@ end
 # in the reduced space, into the full 2^n
 # space. Index is the index from basis_m
 # and d the dimension
-function unfixed_state(stat::AbstractVector, index, d::Int64)
+function unfixed_state(stat::AbstractVector, d::Int64, m::Int64)
+    index = basis_m(d,m)[2]
     l = size(stat)[1]
     state2n = zeros(2^d)
     for (i,v) in enumerate(index)
@@ -36,7 +37,9 @@ function unfixed_state(stat::AbstractVector, index, d::Int64)
     return state2n
 end
 
-function unfixed_state(sta::State_fixed, index, d::Int64)
+function unfixed_state(sta::State_fixed)
+    d = dim(ope(sta))
+    index = basis_m(d,nume(sta))[2]
     stat = st(sta)
     l = size(stat)[1]
     state2n = zeros(2^d)
