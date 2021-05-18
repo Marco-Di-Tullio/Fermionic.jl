@@ -38,7 +38,6 @@ function operators_fixed(n::Int,m::Int)
     return op_general, l1, b
 end
 
-
 #operator c^dagger c for a system with fixed particle number.
 # Much faster than using fiexed over the whole operators
 

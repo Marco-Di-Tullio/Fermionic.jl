@@ -3,6 +3,7 @@ using SparseArrays
 using Test
 
 @testset "Fermionic.jl" begin
+    @test dim(Op(8)) == 8
     @test basis(Op(4))[24] == 1.0
     @test basis(Op(6))[1] == 0.0
     @test cmcd(Op(4),1,2)[5,9] == -1.0
@@ -20,4 +21,9 @@ using Test
     @test st(fixed_state(State([0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],Op(4)),2))[6] == 1
     @test unfixed_state([0,0,0,0,1/sqrt(2),1/sqrt(2)],4,2)[13] == 1/sqrt(2)
     @test st(unfixed_state(State_fixed([0,0,0,0,0,1],Op(4),2)))[13] == 1
+    @test cdc(Op_fixed(4,2),1,2)[4,2] == 1
+    @test ccd(Op_fixed(4,2),1,2)[2,4] == 1
+    @test dim(Op_fixed(8,2)) == 8
+    @test nume(Op_fixed(8,2)) == 2
+    @test basis(Op_fixed(4,2))[4,1] == 1
 end
