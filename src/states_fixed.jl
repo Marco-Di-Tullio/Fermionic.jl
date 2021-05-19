@@ -23,7 +23,7 @@ function rhosp(sta::State_fixed)
     o = ope(sta)
     for i in 1:n
         for j in 1:n
-            rhospv[i,j] = round(estate'*fixed(cdcm(o, i, j), num)*estate, digits = precis)
+            rhospv[i,j] = round(estate'*fixed(cdc(o, i, j), num)*estate, digits = precis)
         end
     end
     return rhospv
