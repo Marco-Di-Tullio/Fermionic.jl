@@ -18,7 +18,7 @@ function rhosp(sta::State)
     o = ope(sta)
     for i in 1:n
         for j in 1:n
-            rhospv[i,j] = round(estate'*cdcm(o, i, j)*estate, digits = precis)
+            rhospv[i,j] = round(estate'*cdc(o, i, j)*estate, digits = precis)
         end
     end
     return rhospv
