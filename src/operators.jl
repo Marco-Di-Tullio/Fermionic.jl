@@ -24,8 +24,8 @@ basis(o::Op) = o.basis
 #first fermionic mode
 cm(o::Op, i::Int) = cmtot(o)[1:le(o),((i-1)*le(o)+1):i*le(o)]
 cdm(o::Op, i::Int) = cdtot(o)[((i-1)*le(o)+1):i*le(o),1:le(o)]
-cdcm(o::Op, i::Int, j::Int) = cdm(o,i)*cm(o,j)
-cmcd(o::Op, i::Int, j::Int) = cm(o,i)*cdm(o,j)
+cdc(o::Op, i::Int, j::Int) = cdm(o,i)*cm(o,j)
+ccd(o::Op, i::Int, j::Int) = cm(o,i)*cdm(o,j)
 cmcm(o::Op, i::Int, j::Int) = cm(o,i)*cm(o,j)
 cdcd(o::Op, i::Int, j::Int) = cdm(o,i)*cdm(o,j)
 
