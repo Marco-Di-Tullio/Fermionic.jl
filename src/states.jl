@@ -18,7 +18,7 @@ function rhosp(sta::State)
     o = ope(sta)
     for i in 1:n
         for j in 1:n
-            rhospv[i,j] = round(estate'*cdc(o, i, j)*estate, digits = precis)
+            rhospv[i,j] = round(estate'*ada(o, i, j)*estate, digits = precis)
         end
     end
     return rhospv
@@ -32,7 +32,7 @@ function kqsp(sta::State)
     o = ope(sta)
     for i in 1:n
         for j in 1:n
-            k[i,j] = round(estate'*cmcm(o, j, i)*estate, digits = precis)
+            k[i,j] = round(estate'*aa(o, j, i)*estate, digits = precis)
         end
     end
     return k
@@ -52,3 +52,19 @@ rhoqsp(s::State) = [rhosp(s) kqsp(s); kqsp(s)' I-rhosp(s)']
 # function State(st,ope;nume=missing)
 #     return State(st,ope,nume)
 # end
+
+# non_zero inputs a vector c and a precision (number of digits)
+# and outputs two vectors: the first one indicating the indexes
+# of non zero elements (up to precision prec) and the second
+# the coefficient in each of these non zero indexes
+function non_zero(c, prec)
+    a = similar(c, Int)
+    cof = similar(c, Float64)
+    count = 1
+    @inbounds for i in eachindex(c)
+        a[count] = i
+        cof[count] = round(c[i], digits = prec)
+        count += (round(c[i], digits = prec) != zero(eltype(c)))
+    end
+    return resize!(a, count-1), resize!(cof, count-1)
+end

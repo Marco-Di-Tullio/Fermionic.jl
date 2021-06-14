@@ -15,8 +15,8 @@ cdctot(o::Op_fixed) = o.cdctot
 le(o::Op_fixed) = o.le
 basis(o::Op_fixed) = o.basis
 
-cdc(o::Op_fixed,i,j) = cdctot(o)[(1+(i-1)*le(o)):i*le(o),(1+(j-1)*le(o)):j*le(o)]
-ccd(o::Op_fixed,i,j) = cdc(o,j,i)
+ada(o::Op_fixed,i,j) = cdctot(o)[(1+(i-1)*le(o)):i*le(o),(1+(j-1)*le(o)):j*le(o)]
+aad(o::Op_fixed,i,j) = ada(o,j,i)
 
 # Here we create the full matrix with all
 # fixed particle operators definitions
@@ -24,24 +24,24 @@ function operators_fixed(n::Int,m::Int)
     l1 = binomial(n,m)
     l2 = n*l1
     b,ind = basis_m(n,m)
-    a=spzeros(l2,l2)
+    z = spzeros(l2,l2)
     for i in 1:n
         for j in i:n
             if i==j
-                a[(1+(i-1)*l1):i*l1,(1+(j-1)*l1):j*l1] = 1/2*cdc(b,ind,i,j)
+                z[(1+(i-1)*l1):i*l1,(1+(j-1)*l1):j*l1] = 1/2*ada(b,ind,i,j)
             else
-                a[(1+(i-1)*l1):i*l1,(1+(j-1)*l1):j*l1] = cdc(b,ind,i,j)
+                z[(1+(i-1)*l1):i*l1,(1+(j-1)*l1):j*l1] = ada(b,ind,i,j)
             end
         end
     end
-    op_general = a+a'
+    op_general = z+z'
     return op_general, l1, b
 end
 
 #operator c^dagger c for a system with fixed particle number.
 # Much faster than using fiexed over the whole operators
 
-function cdc(n::Int64, m::Int64, i::Int64, j::Int64)
+function ada(n::Int64, m::Int64, i::Int64, j::Int64)
     base, ind = basis_m(n,m)
     indice = ind .-1
     l = binomial(n,m)
@@ -67,7 +67,7 @@ end
 
 # When using many operators, it is easier to predefine the basis outside
 # the function
-function cdc(base::SparseArrays.SparseMatrixCSC{Float64,Int64}, ind::SparseArrays.SparseVector{Float64,Int64}, i::Int64, j::Int64)
+function ada(base::SparseArrays.SparseMatrixCSC{Float64,Int64}, ind::SparseArrays.SparseVector{Float64,Int64}, i::Int64, j::Int64)
     l = size(base)[1]
     n = size(base)[2]
     op = spzeros(l,l)
@@ -92,12 +92,12 @@ function cdc(base::SparseArrays.SparseMatrixCSC{Float64,Int64}, ind::SparseArray
 end
 
 # the c c^dagger operator, is the
-function ccd(n::Int64, m::Int64, i::Int64, j::Int64)
-    return cdc(n,m,j,i)
+function aad(n::Int64, m::Int64, i::Int64, j::Int64)
+    return ada(n,m,j,i)
 end
 
-function ccd(base::SparseArrays.SparseMatrixCSC{Float64,Int64}, indice::SparseArrays.SparseVector{Float64,Int64}, i::Int64, j::Int64)
-    return cdc(base,indice,j,i)
+function aad(base::SparseArrays.SparseMatrixCSC{Float64,Int64}, indice::SparseArrays.SparseVector{Float64,Int64}, i::Int64, j::Int64)
+    return ada(base,indice,j,i)
 end
 
 

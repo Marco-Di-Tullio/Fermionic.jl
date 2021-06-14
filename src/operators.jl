@@ -22,12 +22,12 @@ basis(o::Op) = o.basis
 #By calling cm(op, 1) we get the sparse matrix
 #corresponding to the destruction of the
 #first fermionic mode
-cm(o::Op, i::Int) = cmtot(o)[1:le(o),((i-1)*le(o)+1):i*le(o)]
-cdm(o::Op, i::Int) = cdtot(o)[((i-1)*le(o)+1):i*le(o),1:le(o)]
-cdc(o::Op, i::Int, j::Int) = cdm(o,i)*cm(o,j)
-ccd(o::Op, i::Int, j::Int) = cm(o,i)*cdm(o,j)
-cmcm(o::Op, i::Int, j::Int) = cm(o,i)*cm(o,j)
-cdcd(o::Op, i::Int, j::Int) = cdm(o,i)*cdm(o,j)
+a(o::Op, i::Int) = cmtot(o)[1:le(o),((i-1)*le(o)+1):i*le(o)]
+ad(o::Op, i::Int) = cdtot(o)[((i-1)*le(o)+1):i*le(o),1:le(o)]
+ada(o::Op, i::Int, j::Int) = ad(o,i)*a(o,j)
+aad(o::Op, i::Int, j::Int) = a(o,i)*ad(o,j)
+aa(o::Op, i::Int, j::Int) = a(o,i)*a(o,j)
+adad(o::Op, i::Int, j::Int) = ad(o,i)*ad(o,j)
 
 function vacuum(o::Op)
     l = 2^dim(o)
