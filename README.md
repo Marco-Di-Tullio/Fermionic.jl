@@ -49,7 +49,7 @@ o = Op(d)
 
 # We build the state by applying creation operators on the vacuum
 vac = vacuum(o)
-st = cdm(o,1)*cdm(o,2)*cdm(o,3)*vac
+st = ad(o,1)*ad(o,2)*ad(o,3)*vac
 ```
 Output
 ```julia
@@ -93,10 +93,10 @@ epsilon = [2*e0*(i-d/4-1/2) for i in 1:d/2]
 epsilon = sort([epsilon; epsilon])
 
 # The non interacting Hamiltonian
-h0 = sum([epsilon[i]*(cdm(o,i)*cm(o,i) + cdm(o,i+1)*cm(o,i+1)) for i in 1:2:(Int(d)-1)])
+h0 = sum([epsilon[i]*(ada(o,i,i) + ada(o,i+1,i+1)) for i in 1:2:(Int(d)-1)])
 
 # The interacting Hamiltonian
-hi = sum([sum([if i==j spzeros(2^d, 2^d) else g*(cdm(o,j)*cdm(o,j+1)*cm(o,i+1)*cm(o,i)) end
+hi = sum([sum([if i==j spzeros(2^d, 2^d) else g*(ad(o,j)*ad(o,j+1)*a(o,i+1)*a(o,i)) end
                     for i in 1:2:(Int(d)-1)]) for j in 1:2:(Int(d)-1)])
 
 # The full Hamiltonian
