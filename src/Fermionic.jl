@@ -11,7 +11,7 @@ include("logic_gates.jl")
 include("operators_fixed.jl")
 include("mixed.jl")
 
-export Op, dim, basis, cm, cdm, cmcm, cdcd, vacuum
+export Op, dim, basis, a, ad, ada, aad, aa, adad, vacuum
 export State, st, ope, typ, rhosp, rhoqsp
 export eigensp, ssp, eigenqsp, sqsp, majorization_sp, majorization_qsp, n_avg, rhom, rhomd, trp
 export sigma_x, sigma_y, sigma_z, phase, hadamard, ucnot, swap

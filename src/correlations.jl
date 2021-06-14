@@ -191,10 +191,10 @@ function rhomd(s::State, m::Int64)
     ty = typ(s)
     u, _ = svd(cof_mat(o, d, num, m, bas, estat, ty))
     and = sparse([non_diag_ops(o, d, num, m, bas, j) for j in 1:binomial(d, m)])
-    ad = sparse([diag_ops(o, d, num, m, bas, u, and, j) for j in 1:binomial(d, m)])
-    #ad[1] es evaluar la funcion diagonal en i=1
+    adi = sparse([diag_ops(o, d, num, m, bas, u, and, j) for j in 1:binomial(d, m)])
+    #adi[1] es evaluar la funcion diagonal en i=1
     for i in 1:binomial(d, m)
-        rhomd[i,i] = round(estat'*ad[i]*ad[i]'*estat, digits = 14)
+        rhomd[i,i] = round(estat'*adi[i]*adi[i]'*estat, digits = 14)
     end
     return rhomd
 end
@@ -210,10 +210,10 @@ function rhomd(s::State_fixed, m::Int64)
     ty = typ(s)
     u, _ = svd(cof_mat_fixed(o, d, num, m, bas, bas_tot, estat, ty))
     and = sparse([non_diag_ops(o, d, num, m, bas, i) for i in 1:binomial(d, m)])
-    ad = sparse([diag_ops(o, d, num, m, bas, u, and, i) for i in 1:binomial(d, m)])
+    adi = sparse([diag_ops(o, d, num, m, bas, u, and, i) for i in 1:binomial(d, m)])
     #ad[1] es evaluar la funcion diagonal en i=1
     for i in 1:binomial(d, m)
-        rhomd[i,i] = round(estat'*fixed(ad[i]*ad[i]',num)*estat, digits = 14)
+        rhomd[i,i] = round(estat'*fixed(adi[i]*adi[i]',num)*estat, digits = 14)
     end
     return rhomd
 end
@@ -291,19 +291,19 @@ function non_diag_ops(o, d, nume, m, bas, i)
     #le es nume-1 me parece
     mel = 1
     for j in 1:m
-        mel = mel*cdm(o, Int(vec[j]))
+        mel = mel*ad(o, Int(vec[j]))
     end
     return mel
 end
 
 function diag_ops(o, d, nume, m, bas, u, and, i)
-    ad = spzeros(2^d, 2^d)
+    adi = spzeros(2^d, 2^d)
     for j in 1:binomial(d,m)
         if round(u[j,i], digits=14) != 0
-            ad = ad + u[j, i]*and[j]
+            adi = adi + u[j, i]*and[j]
         end
     end
-    return ad
+    return adi
 end
 
 #= Work in Progress: non diagonal operators with fixed states
@@ -352,8 +352,8 @@ function trp(state::State, modos::Array{Int64,1})
     lista = sort(modos)
     listb = filter(x->x ∉ lista,full)
     for k in 1:2^d
-        indicea=parse(Int,join([Int(bas[k,i]) for i in lista]), base=2)+1
-        indiceb=parse(Int,join([Int(bas[k,i]) for i in listb]), base=2)+1
+        indicea = parse(Int,join([Int(bas[k,i]) for i in lista]), base=2)+1
+        indiceb = parse(Int,join([Int(bas[k,i]) for i in listb]), base=2)+1
         signi = 0
         for i in lista
             listac = filter(x->x <= i-1,listb)
@@ -364,9 +364,9 @@ function trp(state::State, modos::Array{Int64,1})
             signi = signi + signl*bas[k,i]
         end
         sign = (-1)^(signi)
-        zvr[indicea,indiceb]=sta[k]*sign
+        zvr[indicea,indiceb] = sta[k]*sign
     end
-    rhoa=zvr*zvr'
+    rhoa = zvr*zvr'
     #rhob=zvr'*zvr;
     return rhoa
 end

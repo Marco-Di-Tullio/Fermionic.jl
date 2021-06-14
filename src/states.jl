@@ -18,7 +18,7 @@ function rhosp(sta::State)
     o = ope(sta)
     for i in 1:n
         for j in 1:n
-            rhospv[i,j] = round(estate'*cdc(o, i, j)*estate, digits = precis)
+            rhospv[i,j] = round(estate'*ada(o, i, j)*estate, digits = precis)
         end
     end
     return rhospv
@@ -32,7 +32,7 @@ function kqsp(sta::State)
     o = ope(sta)
     for i in 1:n
         for j in 1:n
-            k[i,j] = round(estate'*cmcm(o, j, i)*estate, digits = precis)
+            k[i,j] = round(estate'*aa(o, j, i)*estate, digits = precis)
         end
     end
     return k
