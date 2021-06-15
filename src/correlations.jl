@@ -1,13 +1,13 @@
-prec = 15 #precision
+#prec = 15 #precision
 
 ##Single Particle
-eigensp(s::State) = sort([round(eigvals(Matrix(rhosp(s)))[i], digits = prec) for i in 1:dim(ope(s))], rev=true)
-eigensp(s::State_fixed) = sort([round(eigvals(Matrix(rhosp(s)))[i], digits = prec) for i in 1:dim(ope(s))], rev=true)
+eigensp(s::State, prec=15) = sort([round(eigvals(Matrix(rhosp(s)))[i], digits = prec) for i in 1:dim(ope(s))], rev=true)
+eigensp(s::State_fixed, prec=15) = sort([round(eigvals(Matrix(rhosp(s)))[i], digits = prec) for i in 1:dim(ope(s))], rev=true)
 # I can not compute eigenvalues
 #directly from sparse matrices
 
-function ssp(sta::State)
-    eigen = eigensp(sta)
+function ssp(sta::State, prec=15)
+    eigen = eigensp(sta, prec)
     lene = length(eigen)
     s = 0
     for i in 1:lene
@@ -18,8 +18,8 @@ function ssp(sta::State)
     return s/lene
 end
 
-function ssp(sta::State_fixed)
-    eigen = eigensp(sta)
+function ssp(sta::State_fixed, prec=15)
+    eigen = eigensp(sta, prec)
     lene = length(eigen)
     s = 0
     for i in 1:lene
@@ -30,12 +30,12 @@ function ssp(sta::State_fixed)
     return s/lene
 end
 ## Quasi Particles
-eigenqsp(s::State) = sort([round(eigvals(Matrix(rhoqsp(s)))[i], digits = prec) for i in 1:(2*dim(ope(s)))], rev=true)
+eigenqsp(s::State, prec=15) = sort([round(eigvals(Matrix(rhoqsp(s)))[i], digits = prec) for i in 1:(2*dim(ope(s)))], rev=true)
 # I can not compute eigenvalues
 #directly from sparse matrices
 
-function sqsp(sta::State)
-    eigen = eigenqsp(sta)
+function sqsp(sta::State, prec=15)
+    eigen = eigenqsp(sta, prec)
     lene = length(eigen)
     s = 0
     for i in 1:lene
@@ -46,12 +46,6 @@ function sqsp(sta::State)
     return s/lene
 end
 
-#This macro serves for printing as a string the variable's name
-#=
-macro Name(arg)
-   string(arg)
-end
-=#
 #This function outputs 1 if s1 majorizes s2,
 #-1 if s2 majorizes s1,
 #0 if there is no majorization relation
@@ -110,45 +104,10 @@ function n_avg(s::State)
     return navg
 end
 
-#= This code is faster for many iterations
-
-count = 0
-@time for i in 1:repeticiones
-    #definimos estado premedida
-    state_ran = spzeros(Complex{Float64},l)
-    for i in 1:l
-        if sum(basis(o)[i,:]) == nume
-            state_ran[i] = 2*rand(Complex{Float64},1)[1]-1-im
-        end
-    end
-    state_ran = state_ran/sqrt(state_ran'*state_ran)
-    state_ran = State_sparse_complex(state_ran, o);
-    #e = sort(eigvals(Matrix(rhoqsp(state_ran))), rev=true)
-
-    #ahora medimos
-    state_ran_medido = operator*st(state_ran);
-    state_ran_medido = state_ran_medido/sqrt(state_ran_medido'*state_ran_medido)
-    state_ran_medido = State_sparse_complex(state_ran_medido, o)
-    #e_medido = sort(eigvals(Matrix(rhoqsp(state_ran_medido))), rev=true)
-
-    #y chequeamos mayorización
-    global count = count + majorization_qsp(state_ran_medido, state_ran)
-end
-
-if count == repeticiones
-    println("Measured state qsp majorizes unmeasured state")
-elseif count == -repeticiones
-    println("Unmeasured state qsp majorizes measured state")
-else
-    println("There is no qsp majorization")
-end
-
-=#
-
 ####################################################
 #The following are the rhom matrices without diagonalization
 # i.e. in the original basis
-function rhom(s::State, m::Int64)
+function rhom(s::State, m::Int64, prec=15)
     o = ope(s)
     num = Int(round(n_avg(s),digits = 8))
     d = dim(o) #tengo que pasar a matrix lamentablemente
@@ -158,30 +117,52 @@ function rhom(s::State, m::Int64)
     and = sparse([non_diag_ops(o, d, num, m, bas, j) for j in 1:binomial(d, m)])
     for i in 1:binomial(d, m)
         for j in 1:binomial(d,m)
-            rhomd[i,j] = round(estat'*and[j]*and[i]'*estat, digits = 14)
+            rhomd[i,j] = round(estat'*and[j]*and[i]'*estat, digits = prec)
         end
     end
     return rhomd
 end
 
-function rhom(s::State_fixed, m::Int64)
-    o = ope(s)
+# método directo (muy lento)
+# function rhom2(s::State)
+#     d = dim(ope(s))
+#     o = ope(s)
+#     bas,_ = basis_m(d,2)
+#     l = Int(binomial(d,2))
+#     rhom = spzeros(l,l);
+#     stat = st(s)
+#     for i in 1:l
+#         indi = indx(bas[i,:])
+#         for j in 1:l
+#             indj = indx(bas[j,:])
+#                 rhom[i,j]=(stat'*ad(o,Int(indi[2]))*ad(o,Int(indi[1]))*a(o,Int(indj[1]))*a(o,Int(indj[2]))*stat)
+#         end
+#     end
+#     return rhom
+# end
+
+#rhom(State(1/sqrt(2)*(ad(o,1)*ad(o,2)*ad(o,3)*ad(o,4)+ad(o,3)*ad(o,4)*ad(o,5)*ad(o,6))*vacuum(o),o),2)
+
+# It works, but it is not efficient,
+# we need to optimieze ir for state_fixed
+function rhom(s::State_fixed, o::Op, m::Int64, prec=15)
+    d = dim(o)
+    #o = Op(d)
     num = nume(s)
-    d = dim(o) #tengo que pasar a matrix lamentablemente
     rhomd = spzeros(typ(s),binomial(d, m), binomial(d, m))
     bas,_ = basis_m(d, m)
     estat = st(s)
     and = sparse([non_diag_ops(o, d, num, m, bas, j) for j in 1:binomial(d, m)])
     for i in 1:binomial(d, m)
         for j in 1:binomial(d,m)
-            rhomd[i,j] = round(estat'*fixed(and[j]*and[i]',num)*estat, digits = 14)
+            rhomd[i,j] = round(estat'*fixed(and[j]*and[i]',num)*estat, digits = prec)
         end
     end
     return rhomd
 end
 
 #main function
-function rhomd(s::State, m::Int64)
+function rhomd(s::State, m::Int64, prec=15)
     o = ope(s)
     num = Int(round(n_avg(s),digits = 8))
     d = dim(o) #tengo que pasar a matrix lamentablemente
@@ -194,15 +175,17 @@ function rhomd(s::State, m::Int64)
     adi = sparse([diag_ops(o, d, num, m, bas, u, and, j) for j in 1:binomial(d, m)])
     #adi[1] es evaluar la funcion diagonal en i=1
     for i in 1:binomial(d, m)
-        rhomd[i,i] = round(estat'*adi[i]*adi[i]'*estat, digits = 14)
+        rhomd[i,i] = round(estat'*adi[i]*adi[i]'*estat, digits = prec)
     end
     return rhomd
 end
 
-function rhomd(s::State_fixed, m::Int64)
-    o = ope(s)
+# It works, but it is not efficient,
+# we need to optimieze ir for state_fixed
+function rhomd(s::State_fixed, o::Op, m::Int64, prec=15)
+    d = dim(o)
+    #o = Op(d)
     num = nume(s)
-    d = dim(o) #tengo que pasar a matrix lamentablemente
     rhomd = spzeros(typ(s),binomial(d, m), binomial(d, m))
     bas_tot, _ = basis_m(d, num)
     bas, _ = basis_m(d, m)
@@ -213,16 +196,40 @@ function rhomd(s::State_fixed, m::Int64)
     adi = sparse([diag_ops(o, d, num, m, bas, u, and, i) for i in 1:binomial(d, m)])
     #ad[1] es evaluar la funcion diagonal en i=1
     for i in 1:binomial(d, m)
-        rhomd[i,i] = round(estat'*fixed(adi[i]*adi[i]',num)*estat, digits = 14)
+        rhomd[i,i] = round(estat'*fixed(adi[i]*adi[i]',num)*estat, digits = prec)
     end
     return rhomd
+end
+
+#A more efficient 2 body DM in fixed space
+function rhom2(s::State_fixed, prec=15)
+    m = 2
+    o = ope(s)
+    num = nume(s)
+    d = dim(o)
+    rhomnd = spzeros(typ(s),binomial(d, m), binomial(d, m))
+    bas,_ = basis_m(d,m)
+    estat = st(s)
+    for i in 1:binomial(d, m)
+        indi = indx(bas[i,:])
+        for j in 1:binomial(d,m)
+            indj = indx(bas[j,:])
+            #rhomd[i,j] = round(estat'*fixed(and[j]*and[i]',num)*estat, digits = 14)
+            if indi[2] != indj[1] && indi[1] != indj[2]
+                rhomnd[i,j] = round(estat'*ada(o,indj[1],indi[1])*ada(o,indj[2],indi[2])*estat, digits = prec)
+            else
+                rhomnd[i,j] = round(-estat'*ada(o,indj[1],indi[2])*ada(o,indj[2],indi[1])*estat, digits = prec)
+            end
+        end
+    end
+    return rhomnd
 end
 
 #the following are m-body matrices: work on progress
 #for example, for a vector [0,1,0,0,1]->[2,5]
 function indx(arr)
     l = length(arr)
-    ind = spzeros(0)
+    ind = spzeros(Int,0)
     for i=1:l
         if arr[i] != 0
             ind = sparse([ind; i])
@@ -428,5 +435,46 @@ function trp(state::Union{State_complex_fixed,State_sparse_complex_fixed},modos:
     rhoa=zvr*zvr'
     #rhob=zvr'*zvr;
     return rhoa
+end
+=#
+
+#= This code is faster for many iterations (majorization)
+count = 0
+@time for i in 1:repeticiones
+    #definimos estado premedida
+    state_ran = spzeros(Complex{Float64},l)
+    for i in 1:l
+        if sum(basis(o)[i,:]) == nume
+            state_ran[i] = 2*rand(Complex{Float64},1)[1]-1-im
+        end
+    end
+    state_ran = state_ran/sqrt(state_ran'*state_ran)
+    state_ran = State_sparse_complex(state_ran, o);
+    #e = sort(eigvals(Matrix(rhoqsp(state_ran))), rev=true)
+
+    #ahora medimos
+    state_ran_medido = operator*st(state_ran);
+    state_ran_medido = state_ran_medido/sqrt(state_ran_medido'*state_ran_medido)
+    state_ran_medido = State_sparse_complex(state_ran_medido, o)
+    #e_medido = sort(eigvals(Matrix(rhoqsp(state_ran_medido))), rev=true)
+
+    #y chequeamos mayorización
+    global count = count + majorization_qsp(state_ran_medido, state_ran)
+end
+
+if count == repeticiones
+    println("Measured state qsp majorizes unmeasured state")
+elseif count == -repeticiones
+    println("Unmeasured state qsp majorizes measured state")
+else
+    println("There is no qsp majorization")
+end
+
+=#
+
+#This macro serves for printing as a string the variable's name
+#=
+macro Name(arg)
+   string(arg)
 end
 =#
