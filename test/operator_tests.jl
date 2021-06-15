@@ -21,7 +21,7 @@ using Test
     @test fixed_state([0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],2)[6] == 1
     @test st(fixed_state(State([0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],Op(4)),2))[6] == 1
     @test unfixed_state([0,0,0,0,1/sqrt(2),1/sqrt(2)],4,2)[13] == 1/sqrt(2)
-    @test st(unfixed_state(State_fixed([0,0,0,0,0,1],Op(4),2)))[13] == 1
+    @test st(unfixed_state(State_fixed([0,0,0,0,0,1],Op_fixed(4,2))))[13] == 1
     @test ada(Op_fixed(4,2),1,2)[4,2] == 1
     @test aad(Op_fixed(4,2),1,2)[2,4] == 1
     @test dim(Op_fixed(8,2)) == 8

@@ -40,6 +40,19 @@ end
 
 rhoqsp(s::State) = [rhosp(s) kqsp(s); kqsp(s)' I-rhosp(s)']
 
+function non_zero(c, prec=15)
+    a = similar(c, Int)
+    cof = similar(c, Float64)
+    count = 1
+    @inbounds for i in eachindex(c)
+        a[count] = i
+        cof[count] = round(c[i], digits = prec)
+        count += (round(c[i], digits = prec) != zero(eltype(c)))
+    end
+    return resize!(a, count-1), resize!(cof, count-1)
+end
+
+
 #states constructors for both states_fixed and states
 #disadvantage is that working with unmutables is less efficient
 #also I believe it would be better to have both structs
@@ -57,14 +70,3 @@ rhoqsp(s::State) = [rhosp(s) kqsp(s); kqsp(s)' I-rhosp(s)']
 # and outputs two vectors: the first one indicating the indexes
 # of non zero elements (up to precision prec) and the second
 # the coefficient in each of these non zero indexes
-function non_zero(c, prec)
-    a = similar(c, Int)
-    cof = similar(c, Float64)
-    count = 1
-    @inbounds for i in eachindex(c)
-        a[count] = i
-        cof[count] = round(c[i], digits = prec)
-        count += (round(c[i], digits = prec) != zero(eltype(c)))
-    end
-    return resize!(a, count-1), resize!(cof, count-1)
-end
