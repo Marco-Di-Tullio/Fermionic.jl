@@ -10,35 +10,33 @@ ope(s::State) = s.ope
 
 typ(s::State) = eltype(s.st)
 
-function rhosp(sta::State)
-    precis = 15
+function rhosp(sta::State, prec=15)
     n = dim(ope(sta))
     rhospv = spzeros(typ(sta),n,n)
     estate = st(sta)
     o = ope(sta)
     for i in 1:n
         for j in 1:n
-            rhospv[i,j] = round(estate'*ada(o, i, j)*estate, digits = precis)
+            rhospv[i,j] = round(estate'*ada(o, i, j)*estate, digits = prec)
         end
     end
     return rhospv
 end
 
-function kqsp(sta::State)
-    precis = 15
+function kqsp(sta::State, prec=15)
     n = dim(ope(sta))
     k = spzeros(typ(sta),n,n)
     estate = st(sta)
     o = ope(sta)
     for i in 1:n
         for j in 1:n
-            k[i,j] = round(estate'*aa(o, j, i)*estate, digits = precis)
+            k[i,j] = round(estate'*aa(o, j, i)*estate, digits = prec)
         end
     end
     return k
 end
 
-rhoqsp(s::State) = [rhosp(s) kqsp(s); kqsp(s)' I-rhosp(s)']
+rhoqsp(s::State, prec=15) = [rhosp(s, prec) kqsp(s, prec); kqsp(s, prec)' I-rhosp(s, prec)']
 
 function non_zero(c, prec=15)
     a = similar(c, Int)

@@ -107,7 +107,7 @@ end
 ####################################################
 #The following are the rhom matrices without diagonalization
 # i.e. in the original basis
-function rhom(s::State, m::Int64)
+function rhom(s::State, m::Int64, prec=15)
     o = ope(s)
     num = Int(round(n_avg(s),digits = 8))
     d = dim(o) #tengo que pasar a matrix lamentablemente
@@ -117,7 +117,7 @@ function rhom(s::State, m::Int64)
     and = sparse([non_diag_ops(o, d, num, m, bas, j) for j in 1:binomial(d, m)])
     for i in 1:binomial(d, m)
         for j in 1:binomial(d,m)
-            rhomd[i,j] = round(estat'*and[j]*and[i]'*estat, digits = 14)
+            rhomd[i,j] = round(estat'*and[j]*and[i]'*estat, digits = prec)
         end
     end
     return rhomd
@@ -145,7 +145,7 @@ end
 
 # It works, but it is not efficient,
 # we need to optimieze ir for state_fixed
-function rhom(s::State_fixed, o::Op, m::Int64)
+function rhom(s::State_fixed, o::Op, m::Int64, prec=15)
     d = dim(o)
     #o = Op(d)
     num = nume(s)
@@ -155,14 +155,14 @@ function rhom(s::State_fixed, o::Op, m::Int64)
     and = sparse([non_diag_ops(o, d, num, m, bas, j) for j in 1:binomial(d, m)])
     for i in 1:binomial(d, m)
         for j in 1:binomial(d,m)
-            rhomd[i,j] = round(estat'*fixed(and[j]*and[i]',num)*estat, digits = 14)
+            rhomd[i,j] = round(estat'*fixed(and[j]*and[i]',num)*estat, digits = prec)
         end
     end
     return rhomd
 end
 
 #main function
-function rhomd(s::State, m::Int64)
+function rhomd(s::State, m::Int64, prec=15)
     o = ope(s)
     num = Int(round(n_avg(s),digits = 8))
     d = dim(o) #tengo que pasar a matrix lamentablemente
@@ -175,14 +175,14 @@ function rhomd(s::State, m::Int64)
     adi = sparse([diag_ops(o, d, num, m, bas, u, and, j) for j in 1:binomial(d, m)])
     #adi[1] es evaluar la funcion diagonal en i=1
     for i in 1:binomial(d, m)
-        rhomd[i,i] = round(estat'*adi[i]*adi[i]'*estat, digits = 14)
+        rhomd[i,i] = round(estat'*adi[i]*adi[i]'*estat, digits = prec)
     end
     return rhomd
 end
 
 # It works, but it is not efficient,
 # we need to optimieze ir for state_fixed
-function rhomd(s::State_fixed, o::Op, m::Int64)
+function rhomd(s::State_fixed, o::Op, m::Int64, prec=15)
     d = dim(o)
     #o = Op(d)
     num = nume(s)
@@ -196,7 +196,7 @@ function rhomd(s::State_fixed, o::Op, m::Int64)
     adi = sparse([diag_ops(o, d, num, m, bas, u, and, i) for i in 1:binomial(d, m)])
     #ad[1] es evaluar la funcion diagonal en i=1
     for i in 1:binomial(d, m)
-        rhomd[i,i] = round(estat'*fixed(adi[i]*adi[i]',num)*estat, digits = 14)
+        rhomd[i,i] = round(estat'*fixed(adi[i]*adi[i]',num)*estat, digits = prec)
     end
     return rhomd
 end
