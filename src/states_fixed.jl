@@ -17,6 +17,10 @@ ope(s::State_fixed) = s.ope
 
 nume(s::State_fixed) = nume(s.ope)
 
+dim(s::State_fixed) = dim(s.ope)
+
+basis(s::State_fixed) = basis(s.ope)
+
 typ(s::State_fixed) = eltype(s.st)
 
 function rhosp(sta::State_fixed)

@@ -143,22 +143,35 @@ end
 
 #rhom(State(1/sqrt(2)*(ad(o,1)*ad(o,2)*ad(o,3)*ad(o,4)+ad(o,3)*ad(o,4)*ad(o,5)*ad(o,6))*vacuum(o),o),2)
 
-# It works, but it is not efficient,
-# we need to optimieze ir for state_fixed
-function rhom(s::State_fixed, o::Op, m::Int64, prec=15)
-    d = dim(o)
-    #o = Op(d)
+# # It works, but it is not efficient,
+# # we need to optimieze ir for state_fixed
+# function rhom(s::State_fixed, o::Op, m::Int64, prec=15)
+#     d = dim(o)
+#     #o = Op(d)
+#     num = nume(s)
+#     rhomd = spzeros(typ(s),binomial(d, m), binomial(d, m))
+#     bas,_ = basis_m(d, m)
+#     estat = st(s)
+#     and = sparse([non_diag_ops(o, d, num, m, bas, j) for j in 1:binomial(d, m)])
+#     for i in 1:binomial(d, m)
+#         for j in 1:binomial(d,m)
+#             rhomd[i,j] = round(estat'*fixed(and[j]*and[i]',num)*estat, digits = prec)
+#         end
+#     end
+#     return rhomd
+# end
+
+# For general m with fixed_state
+function rhom(s::State_fixed, m::Int64, prec=15)
+    d = dim(s)
     num = nume(s)
-    rhomd = spzeros(typ(s),binomial(d, m), binomial(d, m))
-    bas,_ = basis_m(d, m)
+    bas_tot = basis(s)
+    bas, _ = basis_m(d, m)
     estat = st(s)
-    and = sparse([non_diag_ops(o, d, num, m, bas, j) for j in 1:binomial(d, m)])
-    for i in 1:binomial(d, m)
-        for j in 1:binomial(d,m)
-            rhomd[i,j] = round(estat'*fixed(and[j]*and[i]',num)*estat, digits = prec)
-        end
-    end
-    return rhomd
+    ty = typ(s)
+    cof = cof_mat_fixed(d, num, m, bas, bas_tot, estat, ty, prec)
+    rho2 = cof*cof'
+    return rho2
 end
 
 #main function
@@ -170,7 +183,7 @@ function rhomd(s::State, m::Int64, prec=15)
     bas, _ = basis_m(d, m)
     estat = st(s)
     ty = typ(s)
-    u, _ = svd(cof_mat(o, d, num, m, bas, estat, ty))
+    u, _ = svd(cof_mat(d, num, m, bas, estat, ty))
     and = sparse([non_diag_ops(o, d, num, m, bas, j) for j in 1:binomial(d, m)])
     adi = sparse([diag_ops(o, d, num, m, bas, u, and, j) for j in 1:binomial(d, m)])
     #adi[1] es evaluar la funcion diagonal en i=1
@@ -191,7 +204,7 @@ function rhomd(s::State_fixed, o::Op, m::Int64, prec=15)
     bas, _ = basis_m(d, m)
     estat = st(s)
     ty = typ(s)
-    u, _ = svd(cof_mat_fixed(o, d, num, m, bas, bas_tot, estat, ty))
+    u, _ = svd(cof_mat_fixed(d, num, m, bas, bas_tot, estat, ty))
     and = sparse([non_diag_ops(o, d, num, m, bas, i) for i in 1:binomial(d, m)])
     adi = sparse([diag_ops(o, d, num, m, bas, u, and, i) for i in 1:binomial(d, m)])
     #ad[1] es evaluar la funcion diagonal en i=1
@@ -238,7 +251,7 @@ function indx(arr)
     return ind
 end
 
-function cof_mat(o, d, num, m, bas, estat, ty)
+function cof_mat(d, num, m, bas, estat, ty)
     cmat = zeros(ty, binomial(d,m),binomial(d,num-m))
     am = sparse([bas[i,:] for i in 1:binomial(d, m)])
     bas_nume_m, _ = basis_m(d, num - m)
@@ -264,8 +277,8 @@ function cof_mat(o, d, num, m, bas, estat, ty)
     return cmat
 end
 
-function cof_mat_fixed(o, d, num, m, bas, bas_tot, estat, ty)
-    cmat = zeros(ty,binomial(d,m),binomial(d,num-m))
+function cof_mat_fixed(d, num, m, bas, bas_tot, estat, ty, prec=15)
+    cmat = spzeros(ty,binomial(d,m),binomial(d,num-m))
     am = sparse([bas[i,:] for i in 1:binomial(d, m)])
     bas_nume_m, _ = basis_m(d, num - m)
     amn = sparse([bas_nume_m[i,:] for i in 1:binomial(d, num-m)])
@@ -286,7 +299,7 @@ function cof_mat_fixed(o, d, num, m, bas, bas_tot, estat, ty)
                 while indx(bas_tot[elem,:]) != indij
                     elem = elem + 1
                 end
-                cmat[i,j] = estat[elem] * (-1)^permut
+                cmat[i,j] = round(estat[elem] * (-1)^permut, digits=prec)
             end
         end
     end
