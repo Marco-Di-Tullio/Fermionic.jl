@@ -3,6 +3,13 @@ using SparseArrays
 using Test
 
 @testset "Fermionic.jl" begin
+    @test dim(State([0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],Op(4))) == 4
+    @test basis(State([0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],Op(4)))[4,:][3] == 1
+    @test typ(State([0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],Op(4))) == Int64
+    @test st(fixed_state(State([0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],Op(4)),2))[6] == 1
+    @test typ(fixed_state(State([0,0,0,0,0,0,0,0,0,0,0,0,im,0,0,0],Op(4)),2)) == Complex{Int64}
+    @test dim(fixed_state(State([0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],Op(4)),2)) == 4
+    @test basis(fixed_state(State([0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],Op(4)),2))[1,:][4] == 1
     @test rhoqsp(State(spzeros(16), Op(4)))[1,1] == 0
     @test rhoqsp(State([0,0,0,1/sqrt(2),0,0,0,0,0,0,0,0,1/sqrt(2),0,0,0],Op(4)))[2,2] == 0.5
     @test rhoqsp(State([0,0,0,im/sqrt(2),0,0,0,0,0,0,0,0,1/sqrt(2),0,0,0],Op(4)))[1,2] == 0

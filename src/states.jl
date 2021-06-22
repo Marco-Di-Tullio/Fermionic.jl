@@ -2,11 +2,16 @@
 struct State{T<:AbstractVector}
     st::T
     ope::Op
+    #State(st,ope) = log(2,length(st)) != dim(ope) ? new(st,ope) : throw(ArgumentError("lenght of vector does not match dimension"))
 end
 
 st(s::State) = s.st
 
 ope(s::State) = s.ope
+
+dim(s::State) = dim(s.ope)
+
+basis(s::State) = basis(s.ope)
 
 typ(s::State) = eltype(s.st)
 
