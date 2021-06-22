@@ -18,6 +18,7 @@ using Test
     @test aad(basis_m(4,2)[1],basis_m(4,2)[2],1,2)[2,4] == 1
     @test aad(6,2,1,2)[8,12] == 1.0
     @test ada(basis_m(4,2)[1],basis_m(4,2)[2],3,3)[5,5] == 1
+    @test fixed(ad(Op(6),1)*a(Op(6),1),2)[11,11] == 1.0
     @test fixed_state([0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],2)[6] == 1
     @test unfixed_state([0,0,0,0,1/sqrt(2),1/sqrt(2)],4,2)[13] == 1/sqrt(2)
     @test st(unfixed_state(State_fixed([0,0,0,0,0,1],Op_fixed(4,2))))[13] == 1
