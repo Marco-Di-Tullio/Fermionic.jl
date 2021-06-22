@@ -105,64 +105,19 @@ function n_avg(s::State)
 end
 
 ####################################################
-#The following are the rhom matrices without diagonalization
-# i.e. in the original basis
-function rhom(s::State, m::Int64, prec=15)
-    o = ope(s)
+# Following are the matrices of coefficients in
+# the m-(N-m) schmidt like decomposition
+function coef(s::State, m::Int64, prec=15)
+    d = dim(s)
     num = Int(round(n_avg(s),digits = 8))
-    d = dim(o) #tengo que pasar a matrix lamentablemente
-    rhomd = spzeros(typ(s),binomial(d, m), binomial(d, m))
-    bas,_ = basis_m(d, m)
+    bas, _ = basis_m(d, m)
     estat = st(s)
-    and = sparse([non_diag_ops(o, d, num, m, bas, j) for j in 1:binomial(d, m)])
-    for i in 1:binomial(d, m)
-        for j in 1:binomial(d,m)
-            rhomd[i,j] = round(estat'*and[j]*and[i]'*estat, digits = prec)
-        end
-    end
-    return rhomd
+    ty = typ(s)
+    cof = cof_mat(d, num, m, bas, estat, ty, prec)
+    return round.(cof,digits=prec)
 end
 
-# método directo (muy lento)
-# function rhom2(s::State)
-#     d = dim(ope(s))
-#     o = ope(s)
-#     bas,_ = basis_m(d,2)
-#     l = Int(binomial(d,2))
-#     rhom = spzeros(l,l);
-#     stat = st(s)
-#     for i in 1:l
-#         indi = indx(bas[i,:])
-#         for j in 1:l
-#             indj = indx(bas[j,:])
-#                 rhom[i,j]=(stat'*ad(o,Int(indi[2]))*ad(o,Int(indi[1]))*a(o,Int(indj[1]))*a(o,Int(indj[2]))*stat)
-#         end
-#     end
-#     return rhom
-# end
-
-#rhom(State(1/sqrt(2)*(ad(o,1)*ad(o,2)*ad(o,3)*ad(o,4)+ad(o,3)*ad(o,4)*ad(o,5)*ad(o,6))*vacuum(o),o),2)
-
-# # It works, but it is not efficient,
-# # we need to optimieze ir for state_fixed
-# function rhom(s::State_fixed, o::Op, m::Int64, prec=15)
-#     d = dim(o)
-#     #o = Op(d)
-#     num = nume(s)
-#     rhomd = spzeros(typ(s),binomial(d, m), binomial(d, m))
-#     bas,_ = basis_m(d, m)
-#     estat = st(s)
-#     and = sparse([non_diag_ops(o, d, num, m, bas, j) for j in 1:binomial(d, m)])
-#     for i in 1:binomial(d, m)
-#         for j in 1:binomial(d,m)
-#             rhomd[i,j] = round(estat'*fixed(and[j]*and[i]',num)*estat, digits = prec)
-#         end
-#     end
-#     return rhomd
-# end
-
-# For general m with fixed_state
-function rhom(s::State_fixed, m::Int64, prec=15)
+function coef(s::State_fixed, m::Int64, prec=15)
     d = dim(s)
     num = nume(s)
     bas_tot = basis(s)
@@ -170,48 +125,27 @@ function rhom(s::State_fixed, m::Int64, prec=15)
     estat = st(s)
     ty = typ(s)
     cof = cof_mat_fixed(d, num, m, bas, bas_tot, estat, ty, prec)
-    rho2 = cof*cof'
-    return rho2
+    return round.(cof,digits=prec)
 end
 
-#main function
-function rhomd(s::State, m::Int64, prec=15)
-    o = ope(s)
-    num = Int(round(n_avg(s),digits = 8))
-    d = dim(o) #tengo que pasar a matrix lamentablemente
-    rhomd = spzeros(typ(s),binomial(d, m), binomial(d, m))
-    bas, _ = basis_m(d, m)
-    estat = st(s)
-    ty = typ(s)
-    u, _ = svd(cof_mat(d, num, m, bas, estat, ty))
-    and = sparse([non_diag_ops(o, d, num, m, bas, j) for j in 1:binomial(d, m)])
-    adi = sparse([diag_ops(o, d, num, m, bas, u, and, j) for j in 1:binomial(d, m)])
-    #adi[1] es evaluar la funcion diagonal en i=1
-    for i in 1:binomial(d, m)
-        rhomd[i,i] = round(estat'*adi[i]*adi[i]'*estat, digits = prec)
-    end
-    return rhomd
+#The following are the rhom matrices without diagonalization
+# i.e. in the original basis
+# For general m with fixed_state
+function rhom(s::Union{State,State_fixed}, m::Int64, prec=15)
+    cof = coef(s, m, prec)
+    rhom = cof*cof'
+    return round.(rhom,digits=prec)
 end
 
-# It works, but it is not efficient,
-# we need to optimieze ir for state_fixed
-function rhomd(s::State_fixed, o::Op, m::Int64, prec=15)
-    d = dim(o)
-    #o = Op(d)
-    num = nume(s)
-    rhomd = spzeros(typ(s),binomial(d, m), binomial(d, m))
-    bas_tot, _ = basis_m(d, num)
-    bas, _ = basis_m(d, m)
-    estat = st(s)
-    ty = typ(s)
-    u, _ = svd(cof_mat_fixed(d, num, m, bas, bas_tot, estat, ty))
-    and = sparse([non_diag_ops(o, d, num, m, bas, i) for i in 1:binomial(d, m)])
-    adi = sparse([diag_ops(o, d, num, m, bas, u, and, i) for i in 1:binomial(d, m)])
-    #ad[1] es evaluar la funcion diagonal en i=1
-    for i in 1:binomial(d, m)
-        rhomd[i,i] = round(estat'*fixed(adi[i]*adi[i]',num)*estat, digits = prec)
-    end
-    return rhomd
+#The following are the rhom matrices with diagonalization
+function rhomd(s::Union{State,State_fixed}, m::Int64, prec=15)
+        r = rhom(s,m,prec)
+        dim = size(r)[1]
+        d = non_zero(eigvals(Matrix(r)))[2]
+        row = [i for i in 1:length(d)]
+        col = row
+        rhomd = sparse(row, col, d, dim, dim)
+        return round.(rhomd,digits=prec)
 end
 
 #A more efficient 2 body DM in fixed space
@@ -238,7 +172,7 @@ function rhom2(s::State_fixed, prec=15)
     return rhomnd
 end
 
-#the following are m-body matrices: work on progress
+# Following function is used for constructing coef and rhom
 #for example, for a vector [0,1,0,0,1]->[2,5]
 function indx(arr)
     l = length(arr)
@@ -251,8 +185,9 @@ function indx(arr)
     return ind
 end
 
-function cof_mat(d, num, m, bas, estat, ty)
-    cmat = zeros(ty, binomial(d,m),binomial(d,num-m))
+# Core functons of the coeficient matrices
+function cof_mat(d, num, m, bas, estat, ty, prec=15)
+    cmat = spzeros(ty, binomial(d,m),binomial(d,num-m))
     am = sparse([bas[i,:] for i in 1:binomial(d, m)])
     bas_nume_m, _ = basis_m(d, num - m)
     amn = sparse([bas_nume_m[i,:] for i in 1:binomial(d, num-m)])
@@ -270,7 +205,7 @@ function cof_mat(d, num, m, bas, estat, ty)
                 end
                 indij = indx(ai+aj)
                 elem = Int(sum([2^(d-i) for i in indij]) + 1)
-                cmat[i,j] = estat[elem] * (-1)^permut
+                cmat[i,j] = round(estat[elem] * (-1)^permut, digits=prec)
             end
         end
     end
@@ -306,6 +241,39 @@ function cof_mat_fixed(d, num, m, bas, bas_tot, estat, ty, prec=15)
     return cmat
 end
 
+
+#Partial trace in a given basis of modes
+function trp(state::State, modos::Array{Int64,1})
+    d = dim(ope(state))
+    bas = basis(ope(state))
+    sta = st(state)
+    lm = length(modos)
+    zvr = zeros(typ(state),2^lm,2^(d-lm))
+    full = [i for i in 1:d]
+    lista = sort(modos)
+    listb = filter(x->x ∉ lista,full)
+    for k in 1:2^d
+        indicea = parse(Int,join([Int(bas[k,i]) for i in lista]), base=2)+1
+        indiceb = parse(Int,join([Int(bas[k,i]) for i in listb]), base=2)+1
+        signi = 0
+        for i in lista
+            listac = filter(x->x <= i-1,listb)
+            signl = 0
+            for l in listac
+                signl = signl+bas[k,l]
+            end
+            signi = signi + signl*bas[k,i]
+        end
+        sign = (-1)^(signi)
+        zvr[indicea,indiceb] = sta[k]*sign
+    end
+    rhoa = zvr*zvr'
+    #rhob=zvr'*zvr;
+    return rhoa
+end
+
+#= This was used for finding the diagonalizing
+# operators in m
 function non_diag_ops(o, d, nume, m, bas, i)
     vec = indx(bas[i, :])
     #le es nume-1 me parece
@@ -325,6 +293,7 @@ function diag_ops(o, d, nume, m, bas, u, and, i)
     end
     return adi
 end
+=#
 
 #= Work in Progress: non diagonal operators with fixed states
 function rhomnd(s::Union{State_fixed,State_sparse_fixed}, m::Int64)
@@ -360,36 +329,6 @@ function rhomnd(s::Union{State_complex_fixed,State_sparse_complex_fixed}, m::Int
     return rhomd
 end
 =#
-
-#Partial trace in a given basis of modes
-function trp(state::State, modos::Array{Int64,1})
-    d = dim(ope(state))
-    bas = basis(ope(state))
-    sta = st(state)
-    lm = length(modos)
-    zvr = zeros(typ(state),2^lm,2^(d-lm))
-    full = [i for i in 1:d]
-    lista = sort(modos)
-    listb = filter(x->x ∉ lista,full)
-    for k in 1:2^d
-        indicea = parse(Int,join([Int(bas[k,i]) for i in lista]), base=2)+1
-        indiceb = parse(Int,join([Int(bas[k,i]) for i in listb]), base=2)+1
-        signi = 0
-        for i in lista
-            listac = filter(x->x <= i-1,listb)
-            signl = 0
-            for l in listac
-                signl = signl+bas[k,l]
-            end
-            signi = signi + signl*bas[k,i]
-        end
-        sign = (-1)^(signi)
-        zvr[indicea,indiceb] = sta[k]*sign
-    end
-    rhoa = zvr*zvr'
-    #rhob=zvr'*zvr;
-    return rhoa
-end
 
 #= Work in Progress: partial trace for fixed particle number
 function trp(state::Union{State_fixed,State_sparse_fixed},modos::Array{Int64,1})
@@ -490,4 +429,102 @@ end
 macro Name(arg)
    string(arg)
 end
+=#
+
+
+#= function rhom(s::State, m::Int64, prec=15)
+#     o = ope(s)
+#     num = Int(round(n_avg(s),digits = 8))
+#     d = dim(o) #tengo que pasar a matrix lamentablemente
+#     rhomd = spzeros(typ(s),binomial(d, m), binomial(d, m))
+#     bas,_ = basis_m(d, m)
+#     estat = st(s)
+#     and = sparse([non_diag_ops(o, d, num, m, bas, j) for j in 1:binomial(d, m)])
+#     for i in 1:binomial(d, m)
+#         for j in 1:binomial(d,m)
+#             rhomd[i,j] = round(estat'*and[j]*and[i]'*estat, digits = prec)
+#         end
+#     end
+#     return rhomd
+# # end
+#
+# #main function
+# function rhomd(s::State, m::Int64, prec=15)
+#     o = ope(s)
+#     num = Int(round(n_avg(s),digits = 8))
+#     d = dim(o) #tengo que pasar a matrix lamentablemente
+#     rhomd = spzeros(typ(s),binomial(d, m), binomial(d, m))
+#     bas, _ = basis_m(d, m)
+#     estat = st(s)
+#     ty = typ(s)
+#     u, _ = svd(cof_mat(d, num, m, bas, estat, ty))
+#     and = sparse([non_diag_ops(o, d, num, m, bas, j) for j in 1:binomial(d, m)])
+#     adi = sparse([diag_ops(o, d, num, m, bas, u, and, j) for j in 1:binomial(d, m)])
+#     #adi[1] es evaluar la funcion diagonal en i=1
+#     for i in 1:binomial(d, m)
+#         rhomd[i,i] = round(estat'*adi[i]*adi[i]'*estat, digits = prec)
+#     end
+#     return rhomd
+# end
+
+método directo (muy lento)
+function rhom2(s::State)
+    d = dim(ope(s))
+    o = ope(s)
+    bas,_ = basis_m(d,2)
+    l = Int(binomial(d,2))
+    rhom = spzeros(l,l);
+    stat = st(s)
+    for i in 1:l
+        indi = indx(bas[i,:])
+        for j in 1:l
+            indj = indx(bas[j,:])
+                rhom[i,j]=(stat'*ad(o,Int(indi[2]))*ad(o,Int(indi[1]))*a(o,Int(indj[1]))*a(o,Int(indj[2]))*stat)
+        end
+    end
+    return rhom
+end
+
+rhom(State(1/sqrt(2)*(ad(o,1)*ad(o,2)*ad(o,3)*ad(o,4)+ad(o,3)*ad(o,4)*ad(o,5)*ad(o,6))*vacuum(o),o),2)
+
+# It works, but it is not efficient,
+# we need to optimieze ir for state_fixed
+function rhom(s::State_fixed, o::Op, m::Int64, prec=15)
+    d = dim(o)
+    #o = Op(d)
+    num = nume(s)
+    rhomd = spzeros(typ(s),binomial(d, m), binomial(d, m))
+    bas,_ = basis_m(d, m)
+    estat = st(s)
+    and = sparse([non_diag_ops(o, d, num, m, bas, j) for j in 1:binomial(d, m)])
+    for i in 1:binomial(d, m)
+        for j in 1:binomial(d,m)
+            rhomd[i,j] = round(estat'*fixed(and[j]*and[i]',num)*estat, digits = prec)
+        end
+    end
+    return rhomd
+end
+
+#
+# # It works, but it is not efficient,
+# # we need to optimieze ir for state_fixed
+# function rhomd(s::State_fixed, o::Op, m::Int64, prec=15)
+#     d = dim(o)
+#     #o = Op(d)
+#     num = nume(s)
+#     rhomd = spzeros(typ(s),binomial(d, m), binomial(d, m))
+#     bas_tot, _ = basis_m(d, num)
+#     bas, _ = basis_m(d, m)
+#     estat = st(s)
+#     ty = typ(s)
+#     u, _ = svd(cof_mat_fixed(d, num, m, bas, bas_tot, estat, ty))
+#     and = sparse([non_diag_ops(o, d, num, m, bas, i) for i in 1:binomial(d, m)])
+#     adi = sparse([diag_ops(o, d, num, m, bas, u, and, i) for i in 1:binomial(d, m)])
+#     #ad[1] es evaluar la funcion diagonal en i=1
+#     for i in 1:binomial(d, m)
+#         rhomd[i,i] = round(estat'*fixed(adi[i]*adi[i]',num)*estat, digits = prec)
+#     end
+#     return rhomd
+# end
+
 =#
