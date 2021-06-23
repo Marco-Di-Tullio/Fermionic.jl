@@ -3,6 +3,7 @@
 struct State_fixed{T<:AbstractVector}
     st::T
     ope::Op_fixed
+    State_fixed(st,ope) = length(st) != binomial(dim(ope),nume(ope)) ? error("lenght of vector does not match dimension") : new{typeof(st)}(st/sqrt(st'*st),ope)
 end
 #
 # struct State_fixed{T<:AbstractVector}

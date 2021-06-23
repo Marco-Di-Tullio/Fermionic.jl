@@ -2,7 +2,7 @@
 struct State{T<:AbstractVector}
     st::T
     ope::Op
-    #State(st,ope) = log(2,length(st)) != dim(ope) ? new(st,ope) : throw(ArgumentError("lenght of vector does not match dimension"))
+    State(st,ope) = log(2,length(st)) != dim(ope) ? error("lenght of vector does not match dimension") : new{typeof(st)}(st/sqrt(st'*st),ope)
 end
 
 st(s::State) = s.st

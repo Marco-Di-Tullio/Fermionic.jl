@@ -3,6 +3,8 @@ using SparseArrays
 using Test
 
 @testset "Fermionic.jl" begin
+    @test_throws ErrorException("lenght of vector does not match dimension")  State_fixed(1/sqrt(2)*[1,0,0,0,0,1,1],Op_fixed(4,2))
+    @test_throws ErrorException("lenght of vector does not match dimension")  State([0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1],Op(4))
     @test dim(State([0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],Op(4))) == 4
     @test basis(State([0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],Op(4)))[4,:][3] == 1
     @test typ(State([0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],Op(4))) == Int64
