@@ -33,7 +33,7 @@ function a(o::Op_semifixed, m::Int, i::Int)
     if i <= o.d
         return sparse(o.adtot[m-1][:,:,i]')
     else
-        return spzeros(binomial(n,m))
+        return spzeros(binomial(o.d,m))
     end
 end
 
