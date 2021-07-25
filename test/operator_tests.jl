@@ -27,4 +27,9 @@ using Test
     @test dim(Op_fixed(8,2)) == 8
     @test nume(Op_fixed(8,2)) == 2
     @test basis(Op_fixed(4,2))[4,1] == 1
+    @test ad(6,3,2)[13,14] == -1
+    @test ad(6,3,7)[29,19] == -1
+    @test a(6,3,2)[12,18] == -1
+    @test ad(6,2,[1,2])[10,1] == -1
+    @test a(6,3,[1,2])[2,18] == 1
 end
