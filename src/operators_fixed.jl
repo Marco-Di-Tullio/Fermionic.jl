@@ -18,6 +18,25 @@ basis(o::Op_fixed) = o.basis
 ada(o::Op_fixed,i,j) = cdctot(o)[(1+(i-1)*le(o)):i*le(o),(1+(j-1)*le(o)):j*le(o)]
 aad(o::Op_fixed,i,j) = ada(o,j,i)
 
+# The following struct initialized the creation
+# and destruction operators, given a diemension
+struct Op_semifixed
+    d::Int
+    adtot::Array{Array{Float64,3},1}
+    Op_semifixed(d) = new(d, opnfixed(d))
+end
+
+ad(o::Op_semifixed, m::Int, i::Int) = sparse(o.adtot[m][:,:,i])
+# a(o::Op_semifixed, m::Int, i::Int) = sparse(o.adtot[m-1][:,:,i]')
+
+function a(o::Op_semifixed, m::Int, i::Int)
+    if i <= o.d
+        return sparse(o.adtot[m-1][:,:,i]')
+    else
+        return spzeros(binomial(n,m))
+    end
+end
+
 # Here we create the full matrix with all
 # fixed particle operators definitions
 function operators_fixed(n::Int,m::Int)
@@ -137,7 +156,8 @@ end
 
 # This is the destruction operator.
 # m is the number of particles in The
-# starting state
+# starting state. It can also be built from ad
+# computing the transpose
 function a(n::Int64, m::Int64, i::Int64)
     if i <= n
         base1, ind1 = basis_m(n,m)
@@ -179,6 +199,18 @@ function a(n::Int64, m::Int64, modes::Array{Int64,1})
         op = a(n,m-k+1,modes[k])*op
     end
     return op
+end
+
+# This function is the core of Op_semifixed
+# initialization. It uses rstack from the package
+# Lazystack. It looses the sparse structure in doing so
+# A pending task is to improve this mechanism
+# We only initialize ad, and compute a as the transpose
+# Changing this function would allow deleting
+# a package from the dependancies of the package
+function opnfixed(d::Int)
+    r = [rstack([ad(d,j,i) for i in 1:d];fill=0.) for i in 1:d for j in 1:(d-1)]
+    return r
 end
 
 #This functions trimms the operators matrix
