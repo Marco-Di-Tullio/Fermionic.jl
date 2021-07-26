@@ -15,8 +15,8 @@ using Test
     @test ada(6,2,3,3)[6,6] == 1.0
     @test ada(6,2,3,2)[14,15] == 1.0
     @test ada(basis_m(4,2)[1],basis_m(4,2)[2],1,2)[4,2] == 1
-    @test aad(basis_m(4,2)[1],basis_m(4,2)[2],1,2)[2,4] == 1
-    @test aad(6,2,1,2)[8,12] == 1.0
+    @test aad(basis_m(4,2)[1],basis_m(4,2)[2],1,2)[2,4] == -1
+    @test aad(6,2,1,2)[8,12] == -1.0
     @test ada(basis_m(4,2)[1],basis_m(4,2)[2],3,3)[5,5] == 1
     @test fixed(ad(Op(6),1)*a(Op(6),1),2)[11,11] == 1.0
     @test fixed_state([0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],2)[6] == 1
@@ -37,4 +37,6 @@ using Test
     @test ad(Op_semifixed(6),4,2)[3,6] == -1
     @test a(Op_semifixed(6),4,2)[13,12] == -1
     @test a(Op_semifixed(6),4,7)[1] == 0
+    @test ad(Op_semifixed(6),2,[1,2])[10,1] == -1
+    @test a(Op_semifixed(6),4,[1,2])[3,12] == 1
 end

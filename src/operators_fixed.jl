@@ -112,11 +112,11 @@ end
 
 # the c c^dagger operator, is the
 function aad(n::Int64, m::Int64, i::Int64, j::Int64)
-    return ada(n,m,j,i)
+    return -ada(n,m,j,i)
 end
 
 function aad(base::SparseArrays.SparseMatrixCSC{Float64,Int64}, indice::SparseArrays.SparseVector{Float64,Int64}, i::Int64, j::Int64)
-    return ada(base,indice,j,i)
+    return -ada(base,indice,j,i)
 end
 
 # This is the creation operator adagger
@@ -189,6 +189,18 @@ function ad(n::Int64, m::Int64, modes::Array{Int64,1})
     end
     return op
 end
+
+# This serves for applying several creations op
+# at once. Modes will be a vector with the chosen
+# modes
+function ad(o::Op_semifixed, m::Int64, modes::Array{Int64,1})
+    l = length(modes)
+    op  = ad(o,m,modes[1])
+    for k in 2:l
+        op = ad(o,m+k-1,modes[k])*op
+    end
+    return op
+end
 # This serves for applying several destruction op
 # at once. Modes will be a vector with the chosen
 # modes
@@ -197,6 +209,18 @@ function a(n::Int64, m::Int64, modes::Array{Int64,1})
     op  = a(n,m,modes[1])
     for k in 2:l
         op = a(n,m-k+1,modes[k])*op
+    end
+    return op
+end
+
+# This serves for applying several destruction op
+# at once. Modes will be a vector with the chosen
+# modes
+function a(o::Op_semifixed, m::Int64, modes::Array{Int64,1})
+    l = length(modes)
+    op  = a(o,m,modes[1])
+    for k in 2:l
+        op = a(o,m-k+1,modes[k])*op
     end
     return op
 end
