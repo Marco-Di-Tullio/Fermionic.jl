@@ -10,11 +10,11 @@ Fermionic is a Julia toolkit for implementing fermionic simulations and explorin
 
 Everything relating to fermions can be expressed in terms of annihilation and creation operators. This package numerically constructs fermionic operators and can therefore be used for building any fermionic operator and state. It also defines the main Quantum Gates.
 
-The corresponding fermionic operators can be constructed both in the full Fock space or in the fixed particle number subspace. Then you can define states in the corresponding base and calculate several properties. 
+The corresponding fermionic operators can be constructed both in the full Fock space or in the fixed particle number subspace, which is far more efficient and _the secret weapon_ of this library. Then you can define states in the corresponding base and calculate several properties. 
 
 Many interesting quantities can be obtained from states in Fermionic, such as one body matrices entropy, partially traced systems, m-bodies density matrices, one body entropies, majorization relations, average particle number and more.
 
-You can also perform any unitary operation with this package and use some of the most common logical gates (Pauli matrices, phase shift, Hadamard, Ucnot, SWAP) to perform fermionic quantum computation.
+You can also apply any unitary operation with this package and use some of the most common logical gates (Pauli matrices, phase shift, Hadamard, Ucnot, SWAP) to perform fermionic quantum computation.
 
 
 ## Installation
