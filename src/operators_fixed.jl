@@ -299,3 +299,10 @@ end
 #     end
 #     return op
 # end
+
+# The documentation:
+# - **Op_semifixed(d::Int)**: initializes the fermionic operators $a_i$ and $a_i^\dagger$ corresponding to dimension **d** in the fixed particle subspace. Once initizialized, the following functions are made avaiable.
+#     - **a(o::Op_semifixed, n::Int, i::Int)**: returns the fermionic destruction operator in mode i, i.e. $a_i$, corresponding to the previously defined **o** in the fixed particle subspace with $n$ starting particles.
+#     - **a(o::Op_semifixed,  n::Int, mod::Array{Int,1})**: returns the consecutive fermionic destruction operator of modes in vecor **mod**, i.e. $a_{mod_m}...a_{mod_1}$, corresponding to the previously defined **o** in the fixed particle subspace with $n$ starting particles.
+#     - **ad(o::Op_semifixed,  n::Int, i::Int)**: returns the fermionic creation operator in mode **i**, i.e. $a^\dagger_i$, corresponding to the previously defined **o** in the fixed particle subspace with $n$ starting particles.
+#      - **ad(o::Op_semifixed,  n::Int, mod::Array{Int,1})**: returns the consecutive fermionic creation operator of modes in vecor **mod**, i.e. $a^\dagger_{mod_m}...a^\dagger_{mod_1}$, corresponding to the previously defined **o** in the fixed particle subspace with $n$ starting particles.
