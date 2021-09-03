@@ -18,25 +18,6 @@ basis(o::Op_fixed) = o.basis
 ada(o::Op_fixed,i,j) = cdctot(o)[(1+(i-1)*le(o)):i*le(o),(1+(j-1)*le(o)):j*le(o)]
 aad(o::Op_fixed,i,j) = ada(o,j,i)
 
-# The following struct initialized the creation
-# and destruction operators, given a diemension
-struct Op_semifixed
-    d::Int
-    adtot::Array{Array{Float64,3},1}
-    Op_semifixed(d) = new(d, opnfixed(d))
-end
-
-ad(o::Op_semifixed, m::Int, i::Int) = sparse(o.adtot[m][:,:,i])
-# a(o::Op_semifixed, m::Int, i::Int) = sparse(o.adtot[m-1][:,:,i]')
-
-function a(o::Op_semifixed, m::Int, i::Int)
-    if i <= o.d
-        return sparse(o.adtot[m-1][:,:,i]')
-    else
-        return spzeros(binomial(o.d,m))
-    end
-end
-
 # Here we create the full matrix with all
 # fixed particle operators definitions
 function operators_fixed(n::Int,m::Int)
@@ -190,17 +171,6 @@ function ad(n::Int64, m::Int64, modes::Array{Int64,1})
     return op
 end
 
-# This serves for applying several creations op
-# at once. Modes will be a vector with the chosen
-# modes
-function ad(o::Op_semifixed, m::Int64, modes::Array{Int64,1})
-    l = length(modes)
-    op  = ad(o,m,modes[1])
-    for k in 2:l
-        op = ad(o,m+k-1,modes[k])*op
-    end
-    return op
-end
 # This serves for applying several destruction op
 # at once. Modes will be a vector with the chosen
 # modes
@@ -213,28 +183,20 @@ function a(n::Int64, m::Int64, modes::Array{Int64,1})
     return op
 end
 
-# This serves for applying several destruction op
-# at once. Modes will be a vector with the chosen
-# modes
-function a(o::Op_semifixed, m::Int64, modes::Array{Int64,1})
-    l = length(modes)
-    op  = a(o,m,modes[1])
-    for k in 2:l
-        op = a(o,m-k+1,modes[k])*op
-    end
-    return op
+# The following function initializes the creation
+# operators for each mode given a fixed dimension d
+# and the starting number of particles m
+function adf(d::Int, m::Int)
+    adtot = [ad(d,m+1,i) for i in 1:d]
+    return adtot
 end
 
-# This function is the core of Op_semifixed
-# initialization. It uses rstack from the package
-# Lazystack. It looses the sparse structure in doing so
-# A pending task is to improve this mechanism
-# We only initialize ad, and compute a as the transpose
-# Changing this function would allow deleting
-# a package from the dependancies of the package
-function opnfixed(d::Int)
-    r = [rstack([ad(d,j,i) for i in 1:d];fill=0.) for i in 1:d for j in 1:(d-1)]
-    return r
+# The following function initializes the destruction
+# operators for each mode given a fixed dimension d
+# and the starting number of particles m
+function af(d::Int, m::Int)
+    atot = [a(d,m-1,i) for i in 1:d]
+    return atot
 end
 
 #This functions trimms the operators matrix
@@ -268,3 +230,72 @@ function myfind(c,j)
     end
     return a[1:(count-1)]
 end
+
+
+## What follows is the op_semifixed struct
+# that I previously used for initalizing all
+# creation and destruction op in fixed
+# particle number subspaces, switching
+# from one to the other.
+# I prefer now initalizing only adf and af
+# as it is clearer and spanns most cases
+
+# You should add LazyStack to the dependancies:
+#LazyStack = "1fad7336-0346-5a1a-a56f-a06ba010965b"
+# in Fermionic.jl:
+# using LazyStack
+
+# # The following struct initialized the creation
+# # and destruction operators, given a diemension
+# struct Op_semifixed
+#     d::Int
+#     adtot::Array{Array{Float64,3},1}
+#     Op_semifixed(d) = new(d, opnfixed(d))
+# end
+#
+# ad(o::Op_semifixed, m::Int, i::Int) = sparse(o.adtot[m][:,:,i])
+# # a(o::Op_semifixed, m::Int, i::Int) = sparse(o.adtot[m-1][:,:,i]')
+#
+# function a(o::Op_semifixed, m::Int, i::Int)
+#     if i <= o.d
+#         return sparse(o.adtot[m-1][:,:,i]')
+#     else
+#         return spzeros(binomial(o.d,m))
+#     end
+# end
+
+# # This function is the core of Op_semifixed
+# # initialization. It uses rstack from the package
+# # Lazystack. It looses the sparse structure in doing so
+# # A pending task is to improve this mechanism
+# # We only initialize ad, and compute a as the transpose
+# # Changing this function would allow deleting
+# # a package from the dependancies of the package
+# function opnfixed(d::Int)
+#     r = [rstack([ad(d,j,i) for i in 1:d];fill=0.) for i in 1:d for j in 1:(d-1)]
+#     return r
+# end
+
+# # This serves for applying several creations op
+# # at once. Modes will be a vector with the chosen
+# # modes
+# function ad(o::Op_semifixed, m::Int64, modes::Array{Int64,1})
+#     l = length(modes)
+#     op  = ad(o,m,modes[1])
+#     for k in 2:l
+#         op = ad(o,m+k-1,modes[k])*op
+#     end
+#     return op
+# end
+
+# # This serves for applying several destruction op
+# # at once. Modes will be a vector with the chosen
+# # modes
+# function a(o::Op_semifixed, m::Int64, modes::Array{Int64,1})
+#     l = length(modes)
+#     op  = a(o,m,modes[1])
+#     for k in 2:l
+#         op = a(o,m-k+1,modes[k])*op
+#     end
+#     return op
+# end
