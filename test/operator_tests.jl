@@ -33,10 +33,12 @@ using Test
     @test a(4,3,5)[1] == 0
     @test ad(6,2,[1,2])[10,1] == -1
     @test a(6,3,[1,2])[2,18] == 1
-    @test Op_semifixed(6).d == 6
-    @test ad(Op_semifixed(6),4,2)[3,6] == -1
-    @test a(Op_semifixed(6),4,2)[13,12] == -1
-    @test a(Op_semifixed(6),4,7)[1] == 0
-    @test ad(Op_semifixed(6),2,[1,2])[10,1] == -1
-    @test a(Op_semifixed(6),4,[1,2])[3,12] == 1
+    @test af(4,2)[1] == a(4,2,1)
+    @test adf(4,2)[2] == ad(4,2,2)
+    #@test Op_semifixed(6).d == 6
+    #@test ad(Op_semifixed(6),4,2)[3,6] == -1
+    #@test a(Op_semifixed(6),4,2)[13,12] == -1
+    #@test a(Op_semifixed(6),4,7)[1] == 0
+    #@test ad(Op_semifixed(6),2,[1,2])[10,1] == -1
+    #@test a(Op_semifixed(6),4,[1,2])[3,12] == 1
 end

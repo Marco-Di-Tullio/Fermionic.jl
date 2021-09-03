@@ -187,7 +187,7 @@ end
 # operators for each mode given a fixed dimension d
 # and the starting number of particles m
 function adf(d::Int, m::Int)
-    adtot = [ad(d,m+1,i) for i in 1:d]
+    adtot = [ad(d,m,i) for i in 1:d]
     return adtot
 end
 
@@ -195,7 +195,7 @@ end
 # operators for each mode given a fixed dimension d
 # and the starting number of particles m
 function af(d::Int, m::Int)
-    atot = [a(d,m-1,i) for i in 1:d]
+    atot = [a(d,m,i) for i in 1:d]
     return atot
 end
 
