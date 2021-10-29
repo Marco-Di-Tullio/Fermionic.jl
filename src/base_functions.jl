@@ -83,7 +83,7 @@ function basis_m(n::Int64,m::Int64)
 end
 
 function splitter(x)
-    vectorized = []
+    vectorized = zeros(Int64,0)
     for i in x
         str_to_int = parse(Int, i)
         append!(vectorized, str_to_int)

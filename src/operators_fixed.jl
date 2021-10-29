@@ -3,7 +3,7 @@
 struct Op_fixed
     dim::Int
     nume::Int
-    cdctot::SparseMatrixCSC{Float64,Int64}
+    adatot::SparseMatrixCSC{Float64,Int64}
     le::Int
     basis::SparseMatrixCSC{Float64,Int64}
     Op_fixed(dim,nume) = new(dim, nume, operators_fixed(dim,nume)...)
@@ -11,11 +11,11 @@ end
 
 dim(o::Op_fixed) = o.dim
 nume(o::Op_fixed) = o.nume
-cdctot(o::Op_fixed) = o.cdctot
+adatot(o::Op_fixed) = o.adatot
 le(o::Op_fixed) = o.le
 basis(o::Op_fixed) = o.basis
 
-ada(o::Op_fixed,i,j) = cdctot(o)[(1+(i-1)*le(o)):i*le(o),(1+(j-1)*le(o)):j*le(o)]
+ada(o::Op_fixed,i,j) = adatot(o)[(1+(i-1)*le(o)):i*le(o),(1+(j-1)*le(o)):j*le(o)]
 aad(o::Op_fixed,i,j) = ada(o,j,i)
 
 # Here we create the full matrix with all
