@@ -131,6 +131,6 @@ Output
  0.401524433873062
 ```
 
-This can also be done in a more efficient way working in the fixed particle number subspace, or symbolically (non fixed g and e), as you can see in 'examples\6. Solving a superconducting system (Example)'. 
+This can also be done for varying couplings or even symbolically (non fixed g and e), as you can see in 'examples\6. Solving a superconducting system (Example)'. 
 
 ![](/images/quantuminfo.png)
