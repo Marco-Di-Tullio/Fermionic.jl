@@ -72,7 +72,7 @@ is equal to
  0.0
  ```
  
-A more interesting exaple: Simulating a superconductor.
+A more interesting exaple: Simulating a superconductor in the fixed particle subspace.
 
 ```julia
 using Fermionic
@@ -82,25 +82,27 @@ We will construct the superconducting Hamiltonian, obtain its fundamental state 
 =#
 
 # This system will have 4 levels with a double degeneracy
-d = 8 
-o = Op(d);
+d = 8
+nume = Int(d/2)
+
+o = Op_fixed(d,nume)
 
 # We select the energy of each level and the coupling between them
 e0 = 1.0
 g = 5.0
 
-epsilon = [2*e0*(i-d/4-1/2) for i in 1:d/2]
+epsilon = [e0*(i-d/4-1/2) for i in 1:d/2]
 epsilon = sort([epsilon; epsilon])
 
 # The non interacting Hamiltonian
-h0 = sum([epsilon[i]*(ada(o,i,i) + ada(o,i+1,i+1)) for i in 1:2:(Int(d)-1)])
+h0 = sum([epsilon[i]*(ada(o,i,i) + ada(o,i+1,i+1)) for i in 1:2:(Int(d)-1)]) 
 
 # The interacting Hamiltonian
-hi = sum([sum([if i==j spzeros(2^d, 2^d) else g*(ad(o,j)*ad(o,j+1)*a(o,i+1)*a(o,i)) end
-                    for i in 1:2:(Int(d)-1)]) for j in 1:2:(Int(d)-1)])
+hi = sum([sum([if i==j spzeros(binomial(d,nume), binomial(d,nume)) else -(ada(o,j,i+1)*ada(o,j+1,i)) end
+                    for i in 1:2:(Int(d)-1)]) for j in 1:2:(Int(d)-1)]) 
 
 # The full Hamiltonian
-h = h0 - hi
+h = h0 - g*hi
 
 # We compute the fundamental state of the full Hamiltonian
 fundamental = eigvecs(Matrix(h))[:,1]
@@ -109,7 +111,7 @@ fundamental = eigvecs(Matrix(h))[:,1]
 fundamental = fundamental/sqrt(fundamental'*fundamental)
 
 # We initialize a state with fundamental
-fund = State(fundamental,o)
+fund = State_fixed(fundamental,o)
 
 # We can now access some properties, for instance the eigenvalues of the one body matrix
 eigensp(fund)
@@ -119,14 +121,14 @@ Output
 
 ```julia
 8-element Array{Float64,1}:
- 0.688488188313256
- 0.688488188313256
- 0.575317665651686
- 0.575317665651686
- 0.424682334348314
- 0.424682334348314
- 0.311511811686744
- 0.311511811686744
+ 0.598475566126938
+ 0.598475566126938
+ 0.534545046798091
+ 0.534545046798091
+ 0.465454953201909
+ 0.465454953201909
+ 0.401524433873062
+ 0.401524433873062
 ```
 
 This can also be done in a more efficient way working in the fixed particle number subspace, or symbolically (non fixed g and e), as you can see in 'examples\6. Solving a superconducting system (Example)'. 
